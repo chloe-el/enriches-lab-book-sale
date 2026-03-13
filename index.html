@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enriches Lab Annual Book Sale</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h1>🎓 Enriches Lab Annual Book Sale</h1>
+                </div>
+                <div class="nav-menu">
+                    <input type="text" id="searchInput" class="search-bar" placeholder="Search books...">
+                    <button class="cart-btn" id="cartBtn">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Welcome to Enriches Lab Annual Book Sale</h2>
+                <p>Discover educational books that inspire lifelong learning and mathematical thinking</p>
+            </div>
+        </section>
+
+        <section class="filters">
+            <div class="filter-container">
+                <select id="categoryFilter" class="filter-select">
+                    <option value="all">All Categories</option>
+                    <option value="beast-academy">Beast Academy - Elementary School</option>
+                    <option value="aops-series">AoPS Series - Middle and High School</option>
+                    <option value="math-contest">Math Contest - Middle and High School</option>
+                    <option value="mathstart">MathStart - Early Discovery</option>
+                </select>
+                <select id="sortFilter" class="filter-select">
+                    <option value="default">Sort by</option>
+                    <option value="price-low">Price: Low to High</option>
+                    <option value="price-high">Price: High to Low</option>
+                    <option value="name">Name: A to Z</option>
+                </select>
+            </div>
+        </section>
+
+        <section class="products" id="productsGrid">
+            <!-- Products will be dynamically loaded here -->
+        </section>
+    </main>
+
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3>Shopping Cart</h3>
+                <button class="close-btn" id="closeCart">&times;</button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be dynamically loaded here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <strong>Total: $<span id="cartTotal">0.00</span></strong>
+                </div>
+                <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Enriches Lab. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
