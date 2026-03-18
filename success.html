@@ -75,67 +75,32 @@
             }
             
             try {
-                // Try to get session ID from URL or sessionStorage
-                let sessionId = urlParams.get('session_id');
+                // Skip API calls since endpoints don't exist on Vercel
+                // Go directly to fallback display with order ID
+                console.log('🔄 Using fallback display for Vercel deployment');
                 
-                if (!sessionId) {
-                    // Try to get from sessionStorage
-                    const pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder')) || {};
-                    sessionId = pendingOrder.sessionId;
-                }
-                
-                if (sessionId) {
-                    // Mark order as completed in local storage
-                    try {
-                        await fetch('/complete-order', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ sessionId: sessionId })
-                        });
-                        console.log('✅ Order marked as completed in local storage');
-                    } catch (error) {
-                        console.log('⚠️ Could not mark order as completed:', error.message);
-                    }
-                    
-                    // Fetch order details from Stripe
-                    const response = await fetch(`/order/${sessionId}`);
-                    
-                    if (response.ok) {
-                        const order = await response.json();
-                        displayOrderDetails(order);
-                        return;
-                    }
-                }
-                
-                // Fallback to sessionStorage if Stripe fetch fails
-                const pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder')) || {};
-                if (pendingOrder.orderId === orderId) {
-                    displayFallbackOrderDetails(pendingOrder);
-                    return;
-                }
-                
-                // No order found
+                // No order found - show fallback with order info
                 orderDetailsDiv.innerHTML = `
-                    <div class="error-message">
-                        <p>Order details not found. Order ID: ${orderId}</p>
-                        <p>This might be because:</p>
-                        <ul>
-                            <li>The order was just completed and is being processed</li>
-                            <li>Browser storage was cleared</li>
-                            <li>You're using a different browser or device</li>
-                        </ul>
-                        <p><strong>Order Information:</strong></p>
-                        <ul>
-                            <li>Order ID: ${orderId}</li>
-                            <li>Pickup: Enriches Lab Store, Belmont, CA</li>
-                        </ul>
-                        <p><strong>Next Steps:</strong></p>
-                        <ul>
-                            <li><strong>Email:</strong> You'll receive a confirmation email with your receipt</li>
-                            <li><strong>Pre-order:</strong> Books will be shipped to Enriches Lab in late April 2025</li>
-                            <li><strong>Pickup:</strong> We'll email you when books are available for pickup at Enriches Lab, Belmont, CA</li>
-                            <li><strong>Order ID:</strong> Bring ${orderId} for pickup when books arrive</li>
-                        </ul>
+                    <div class="order-summary">
+                        <h2>Order Summary</h2>
+                        <div class="order-info">
+                            <p><strong>Order ID:</strong> ${orderId}</p>
+                            <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
+                            <p><strong>Status:</strong> <span class="status-completed">Payment Completed</span></p>
+                            <p><strong>Pickup Location:</strong> Enriches Lab Store, Belmont, CA</p>
+                            <p><strong>Order Type:</strong> Pre-order</p>
+                            <p><strong>Estimated Arrival:</strong> Late April 2025</p>
+                        </div>
+                        
+                        <div class="pre-order-notice">
+                            <p><strong>Pre-order Information:</strong></p>
+                            <ul>
+                                <li>Books will be shipped to Enriches Lab in late April 2025</li>
+                                <li>You'll receive an email notification when books are ready for pickup</li>
+                                <li>Bring this Order ID (${orderId}) when picking up your books</li>
+                                <li>9.875% sales tax included in your payment</li>
+                            </ul>
+                        </div>
                     </div>
                 `;
                 
