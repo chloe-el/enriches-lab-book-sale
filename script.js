@@ -363,6 +363,16 @@ function loadCart() {
     console.log('🛒 Cart length after loading:', cart.length);
 }
 
+// Reset checkout button to normal state
+function resetCheckoutButton() {
+    if (checkoutBtn) {
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = 'Proceed to Checkout';
+        checkoutBtn.classList.remove('loading');
+        console.log('🔧 Checkout button reset to normal state');
+    }
+}
+
 // Order management - Use simple array for now (orders stored server-side)
 let orders = [];
 let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
@@ -406,12 +416,16 @@ function initializeApp() {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('cancelled') === 'true') {
         console.log('🔄 User returned from cancelled Stripe checkout - resetting UI');
-        // Reset checkout button if it's frozen
-        if (checkoutBtn) {
-            checkoutBtn.disabled = false;
-            checkoutBtn.textContent = 'Proceed to Checkout';
-        }
+        resetCheckoutButton();
         showNotification('Payment was cancelled. You can try again when ready.');
+        // Clear the URL parameter to prevent repeated notifications
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    // Also check for any frozen button on page load (safety net)
+    if (checkoutBtn && checkoutBtn.disabled && checkoutBtn.textContent.includes('Creating payment')) {
+        console.log('🔧 Detected frozen checkout button - resetting');
+        resetCheckoutButton();
     }
     
     loadCart();
@@ -774,10 +788,10 @@ async function redirectToStripeCheckout() {
     } catch (error) {
         console.error('❌ Payment setup error:', error);
         showNotification('Payment setup failed: ' + error.message);
+        resetCheckoutButton();
     } finally {
-        // Reset button
-        payBtn.disabled = false;
-        payBtn.textContent = originalText;
+        // Reset button (additional safety)
+        resetCheckoutButton();
     }
 }
 
