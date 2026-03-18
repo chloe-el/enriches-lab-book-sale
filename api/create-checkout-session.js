@@ -19,11 +19,15 @@ export default async function handler(req, res) {
     const { orderId, items, customerEmail } = req.body;
 
     console.log('Creating checkout session for order:', orderId);
-    console.log('Items:', items);
+    console.log('Received items:', JSON.stringify(items, null, 2));
 
     // Calculate subtotal and tax
     const TAX_RATE = 0.09875; // 9.875% for Belmont, CA
-    const subtotal = items.reduce((sum, item) => sum + (item.price_data.unit_amount * item.quantity / 100), 0);
+    const subtotal = items.reduce((sum, item) => {
+      const itemAmount = (item.price_data.unit_amount * item.quantity) / 100;
+      console.log(`Item: ${item.price_data.product_data.name}, Amount: $${itemAmount.toFixed(2)}`);
+      return sum + itemAmount;
+    }, 0);
     const tax = subtotal * TAX_RATE;
     
     console.log(`=== TAX CALCULATION ===`);
@@ -55,26 +59,31 @@ export default async function handler(req, res) {
 
     // Add separate tax line item for visibility
     if (tax > 0) {
-        itemsWithoutTax.push({
-            price_data: {
-                currency: 'usd',
-                product_data: {
-                    name: 'Sales Tax (9.875% - Belmont, CA)',
-                    description: 'California sales tax for Belmont, CA 94002 (San Mateo County)',
-                    metadata: {
-                        tax_type: 'sales_tax',
-                        tax_rate: '9.875%',
-                        tax_location: 'Belmont, CA 94002',
-                        tax_jurisdiction: 'San Mateo County'
-                    }
-                },
-                unit_amount: Math.round(tax * 100) // Convert to cents
-            },
-            quantity: 1
-        });
-        console.log('=== TAX LINE ITEM ADDED ===');
-        console.log('Tax amount:', tax);
+      const taxLineItem = {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: 'Sales Tax (9.875% - Belmont, CA)',
+            description: 'California sales tax for Belmont, CA 94002 (San Mateo County)',
+            metadata: {
+              tax_type: 'sales_tax',
+              tax_rate: '9.875%',
+              tax_location: 'Belmont, CA 94002',
+              tax_jurisdiction: 'San Mateo County'
+            }
+          },
+          unit_amount: Math.round(tax * 100) // Convert to cents
+        },
+        quantity: 1
+      };
+      
+      itemsWithoutTax.push(taxLineItem);
+      console.log('=== TAX LINE ITEM ADDED ===');
+      console.log('Tax amount:', tax);
+      console.log('Tax line item:', JSON.stringify(taxLineItem, null, 2));
     }
+
+    console.log('Final items for Stripe:', JSON.stringify(itemsWithoutTax, null, 2));
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
