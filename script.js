@@ -368,7 +368,8 @@ let orders = [];
 let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
 
 // Stripe configuration - Replace with your actual Stripe publishable key
-const stripe = Stripe('pk_live_...'); // Replace with your live publishable key
+// For testing: use test key. For production: use live key
+const stripe = Stripe('pk_test_51MjYP5BH1RcdRKUX3FNL1PlOre8TEsF5xLTW6Efyy5btRq32oWQwLCLgBwqnvsjPz9Z4oT3nXuFgxgF8DTyTZsQ200BkAvwexc');
 
 // DOM elements will be initialized after DOM is ready
 let productsGrid, cartBtn, cartModal, closeCart, cartItems, cartCount, cartTotal, checkoutBtn, searchInput, categoryFilter;
