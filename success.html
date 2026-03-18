@@ -75,9 +75,44 @@
             }
             
             try {
-                // Skip API calls since endpoints don't exist on Vercel
-                // Go directly to fallback display with order ID
-                console.log('🔄 Using fallback display for Vercel deployment');
+                // Try to get session ID from URL or sessionStorage
+                let sessionId = urlParams.get('session_id');
+                
+                if (!sessionId) {
+                    // Try to get from sessionStorage
+                    const pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder')) || {};
+                    sessionId = pendingOrder.sessionId;
+                }
+                
+                if (sessionId) {
+                    // Mark order as completed in local storage
+                    try {
+                        await fetch('/api/complete-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ sessionId: sessionId })
+                        });
+                        console.log('✅ Order marked as completed in local storage');
+                    } catch (error) {
+                        console.log('⚠️ Could not mark order as completed:', error.message);
+                    }
+                    
+                    // Fetch order details from Stripe
+                    const response = await fetch(`/api/order/${sessionId}`);
+                    
+                    if (response.ok) {
+                        const order = await response.json();
+                        displayOrderDetails(order);
+                        return;
+                    }
+                }
+                
+                // Fallback to sessionStorage if Stripe fetch fails
+                const pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder')) || {};
+                if (pendingOrder.orderId === orderId) {
+                    displayFallbackOrderDetails(pendingOrder);
+                    return;
+                }
                 
                 // No order found - show fallback with order info
                 orderDetailsDiv.innerHTML = `
