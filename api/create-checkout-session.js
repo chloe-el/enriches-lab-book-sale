@@ -1,5 +1,5 @@
 // Vercel serverless function for Stripe checkout
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_51MjYP5BH1RcdRKUXMfDxSUi8nQthtIi44UBoVpgSCxzcNJLGllcDW8Dp5BFaNtkfBFOlt0zV15GYP8ja8IFF8ncw007blabqEj');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Calculate tax for order (match local server)
 function calculateTax(subtotal) {
