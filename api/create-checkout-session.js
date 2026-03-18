@@ -108,7 +108,7 @@ export default async function handler(req, res) {
       mode: 'payment',
       success_url: `${req.headers.origin}/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
       cancel_url: `${req.headers.origin}/index.html?cancelled=true`,
-      customer_email: customerEmail,
+      // customer_email removed to allow customers to enter their own email
       metadata: {
         ...metadata,
         subtotal: subtotal.toFixed(2),
