@@ -363,8 +363,7 @@ function loadCart() {
     console.log('🛒 Cart length after loading:', cart.length);
 }
 
-// Order management - Use secure storage in production
-const secureStorage = new SecureStorage();
+// Order management - Use simple array for now (orders stored server-side)
 let orders = [];
 let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
 
