@@ -1,12 +1,5 @@
 [
     {
-        "id": 999,
-        "title": "🧪 Production Test Book - $1",
-        "price": 1.00,
-        "original_price": 1.00,
-        "category": "test"
-    },
-    {
         "id": 13,
         "title": "Prealgebra - text & solutions",
         "price": 50.15,
