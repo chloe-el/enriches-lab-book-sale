@@ -1,0 +1,1207 @@
+// Book inventory data loaded from local JSON file (Primary source)
+let books = [];
+
+// Load books from JSON file (Primary source)
+async function loadBooksFromJSON() {
+    try {
+        console.log('📡 Loading books from JSON...');
+        
+        // Add cache-busting parameter to prevent browser caching
+        const timestamp = Date.now();
+        const response = await fetch(`books.json?t=${timestamp}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const books = await response.json();
+        console.log(`Successfully loaded ${books.length} books from JSON file`);
+        return books;
+    } catch (error) {
+        console.error('❌ Error loading books from JSON:', error);
+        console.log('🔄 Checking if fetch is blocked...');
+        
+        // Check if it's a CORS or network issue
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            console.error('🚫 Fetch blocked - possible CORS issue');
+        } else if (error.name === 'TypeError' && error.message.includes('network')) {
+            console.error('🌐 Network issue - check server connection');
+        } else {
+            console.error('🔍 Other fetch error:', error);
+        }
+        
+        console.log('📚 Using embedded books as fallback...');
+        return getEmbeddedBooks();
+    }
+}
+
+// Embedded books data (fallback when JSON loading fails)
+function getEmbeddedBooks() {
+    return [
+        {
+            "id": 26,
+            "title": "Prealgebra - text & solutions",
+            "price": 50.15,
+            "original_price": 59,
+            "category": "aops-series"
+        },
+        {
+            "id": 7,
+            "title": "Introduction to Algebra - text & solutions",
+            "price": 56.95,
+            "original_price": 67,
+            "category": "aops-series"
+        },
+        {
+            "id": 8,
+            "title": "Introduction to Counting & Probability - text & solutions",
+            "price": 41.65,
+            "original_price": 49,
+            "category": "aops-series"
+        },
+        {
+            "id": 9,
+            "title": "Introduction to Geometry - text & solutions",
+            "price": 55.25,
+            "original_price": 65,
+            "category": "aops-series"
+        },
+        {
+            "id": 10,
+            "title": "Introduction to Number Theory - text & solutions",
+            "price": 46.75,
+            "original_price": 55,
+            "category": "aops-series"
+        },
+        {
+            "id": 5,
+            "title": "Intermediate Algebra - text & solutions",
+            "price": 62.9,
+            "original_price": 74,
+            "category": "aops-series"
+        },
+        {
+            "id": 6,
+            "title": "Intermediate Counting & Probability - text & solutions",
+            "price": 47.6,
+            "original_price": 56,
+            "category": "aops-series"
+        },
+        {
+            "id": 27,
+            "title": "Precalculus - text & solutions",
+            "price": 52.7,
+            "original_price": 62,
+            "category": "aops-series"
+        },
+        {
+            "id": 1,
+            "title": "Calculus - text & solutions",
+            "price": 50.15,
+            "original_price": 59,
+            "category": "aops-series"
+        },
+        {
+            "id": 2,
+            "title": "Competition Math for Middle School",
+            "price": 25.08,
+            "original_price": 29.5,
+            "category": "math-contest"
+        },
+        {
+            "id": 3,
+            "title": "Contest Prep Math - Art of Problem Solving - Volume 1",
+            "price": 39.95,
+            "original_price": 47,
+            "category": "math-contest"
+        },
+        {
+            "id": 4,
+            "title": "Contest Prep Math - Art of Problem Solving - Volume 2",
+            "price": 41.65,
+            "original_price": 49,
+            "category": "math-contest"
+        },
+        {
+            "id": 11,
+            "title": "Level 1 - Guide - A-D - 4 books",
+            "price": 91.8,
+            "original_price": 108,
+            "category": "beast-academy"
+        },
+        {
+            "id": 12,
+            "title": "Level 2 - Guide - A-D - 4 books",
+            "price": 54.4,
+            "original_price": 64,
+            "category": "beast-academy"
+        },
+        {
+            "id": 14,
+            "title": "Level 2 - Practice - A-D - 4 books",
+            "price": 47.6,
+            "original_price": 56,
+            "category": "beast-academy"
+        },
+        {
+            "id": 15,
+            "title": "Level 2 - Puzzle - 1 book",
+            "price": 8.5,
+            "original_price": 10,
+            "category": "beast-academy"
+        },
+        {
+            "id": 16,
+            "title": "Level 3 - Guide A-D - 4 books",
+            "price": 54.4,
+            "original_price": 64,
+            "category": "beast-academy"
+        },
+        {
+            "id": 17,
+            "title": "Level 3 - Practice - A-D - 4 books",
+            "price": 47.6,
+            "original_price": 56,
+            "category": "beast-academy"
+        },
+        {
+            "id": 18,
+            "title": "Level 3 - Puzzle - 1book",
+            "price": 8.5,
+            "original_price": 10,
+            "category": "beast-academy"
+        },
+        {
+            "id": 19,
+            "title": "Level 3 - Science - 3A & 3B - 2 books",
+            "price": 81.6,
+            "original_price": 96,
+            "category": "beast-academy"
+        },
+        {
+            "id": 20,
+            "title": "Level 4 - Guide A-D - 4 books",
+            "price": 54.4,
+            "original_price": 64,
+            "category": "beast-academy"
+        },
+        {
+            "id": 21,
+            "title": "Level 4 - Practice - A-D - 4 books",
+            "price": 47.6,
+            "original_price": 56,
+            "category": "beast-academy"
+        },
+        {
+            "id": 22,
+            "title": "Level 4 - Puzzle - 1book",
+            "price": 8.5,
+            "original_price": 10,
+            "category": "beast-academy"
+        },
+        {
+            "id": 23,
+            "title": "Level 4 - Science - 4A - 1 book",
+            "price": 40.8,
+            "original_price": 48,
+            "category": "beast-academy"
+        },
+        {
+            "id": 24,
+            "title": "Level 5 - Guide A-D - 4 books",
+            "price": 54.4,
+            "original_price": 64,
+            "category": "beast-academy"
+        },
+        {
+            "id": 25,
+            "title": "Level 5 - Practice - A-D - 4 books",
+            "price": 47.6,
+            "original_price": 56,
+            "category": "beast-academy"
+        },
+        {
+            "id": 28,
+            "title": "MathStart - Level 1 - 21 books",
+            "price": 132.15,
+            "category": "mathstart"
+        },
+        {
+            "id": 29,
+            "title": "MathStart - Level 2 - 21 books",
+            "price": 132.15,
+            "category": "mathstart"
+        },
+        {
+            "id": 30,
+            "title": "MathStart - Level 3 - 21 books",
+            "price": 132.15,
+            "category": "mathstart"
+        }
+    ];
+}
+
+// Fallback books if JSON file fails
+function getFallbackBooks() {
+    return [
+        {
+            id: 1,
+            title: "Introduction to Algebra",
+            price: 67,
+            category: "aops-series"
+        },
+        {
+            id: 2,
+            title: "Calculus - text & solutions",
+            price: 59,
+            category: "aops-series"
+        }
+    ];
+}
+
+// Initialize books from JSON
+async function initializeBooks() {
+    console.log('🔄 Clearing caches and loading fresh data...');
+    
+    // Preserve order counter while clearing other caches
+    const orderIdCounter = localStorage.getItem('orderIdCounter');
+    const orders = localStorage.getItem('orders');
+    
+    // Clear all caches to prevent stale data
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Restore important data
+    if (orderIdCounter) {
+        localStorage.setItem('orderIdCounter', orderIdCounter);
+        console.log('🔄 Preserved order ID counter:', orderIdCounter);
+    }
+    if (orders) {
+        localStorage.setItem('orders', orders);
+        console.log('🔄 Preserved orders data');
+    }
+    
+    // Force page reload if this is a fresh start (no previous data)
+    const hasVisitedBefore = sessionStorage.getItem('hasVisitedBefore');
+    if (!hasVisitedBefore) {
+        console.log('🔄 First visit detected, forcing fresh start...');
+        sessionStorage.setItem('hasVisitedBefore', 'true');
+    } else {
+        console.log('🔄 Returning visitor, using cached data...');
+        sessionStorage.removeItem('hasVisitedBefore');
+    }
+    
+    // Force reload books from JSON
+    const booksContainer = document.getElementById('productsGrid');
+    
+    console.log('🎯 Looking for booksContainer:', booksContainer);
+    
+    // Show loading state briefly
+    if (booksContainer) {
+        booksContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i><p>Loading fresh books data...</p></div>';
+        console.log('📡 Showing loading state');
+    }
+    
+    try {
+        // Load books from JSON file (primary source)
+        console.log('📡 Loading books from JSON...');
+        const loadedBooks = await loadBooksFromJSON();
+        
+        console.log(`📚 Books loaded: ${loadedBooks.length}`, loadedBooks);
+        
+        // Store books globally
+        books = loadedBooks;
+        
+        // Hide loading state
+        if (booksContainer) {
+            booksContainer.innerHTML = '';
+        }
+        
+        // Render all books initially
+        console.log('🎨 Rendering all books after successful load...');
+        renderBooks(books);
+        
+    } catch (error) {
+        console.error('❌ Failed to initialize books:', error.message || error);
+        console.log('🔄 Using fallback books...');
+        
+        // Get fallback books and ensure they're properly loaded
+        const fallbackBooks = getFallbackBooks();
+        console.log('📚 Fallback books loaded:', fallbackBooks.length);
+        
+        // Store fallback books globally
+        books = fallbackBooks;
+        
+        // Try to render fallback books
+        if (booksContainer && fallbackBooks.length > 0) {
+            console.log('🎨 Rendering fallback books...');
+            renderBooks(fallbackBooks);
+        } else {
+            console.log('❌ No books available to render');
+            if (booksContainer) {
+                booksContainer.innerHTML = '<div class="empty-cart"><i class="fas fa-search"></i><p>No books found</p></div>';
+            }
+        }
+    }
+    
+    loadOrders();
+    setupEventListeners();
+}
+
+// Shopping cart state
+let cart = [];
+
+// Cart management functions
+function saveCart() {
+    localStorage.setItem('cart', JSON.stringify(cart));
+}
+
+function loadCart() {
+    const storedCart = localStorage.getItem('cart');
+    cart = JSON.parse(storedCart) || [];
+    console.log('🛒 Cart loaded from localStorage:', storedCart);
+    console.log('🛒 Parsed cart:', cart);
+    console.log('🛒 Cart length after loading:', cart.length);
+}
+
+// Order management
+let orders = JSON.parse(localStorage.getItem('orders')) || [];
+let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
+
+// Stripe configuration - Replace with your actual Stripe publishable key
+const stripe = Stripe('pk_test_51MjYP5BH1RcdRKUX3FNL1PlOre8TEsF5xLTW6Efyy5btRq32oWQwLCLgBwqnvsjPz9Z4oT3nXuFgxgF8DTyTZsQ200BkAvwexc');
+
+// DOM elements will be initialized after DOM is ready
+let productsGrid, cartBtn, cartModal, closeCart, cartItems, cartCount, cartTotal, checkoutBtn, searchInput, categoryFilter;
+
+// Initialize the app
+function init() {
+    console.log('🚀 Starting app initialization (script at end of body)...');
+    initializeApp();
+}
+
+function initializeApp() {
+    // Initialize DOM elements
+    productsGrid = document.getElementById('productsGrid');
+    cartBtn = document.getElementById('cartBtn');
+    cartModal = document.getElementById('cartModal');
+    closeCart = document.getElementById('closeCart');
+    cartItems = document.getElementById('cartItems');
+    cartCount = document.getElementById('cartCount');
+    cartTotal = document.getElementById('cartTotal');
+    checkoutBtn = document.getElementById('checkoutBtn');
+    searchInput = document.getElementById('searchInput');
+    categoryFilter = document.getElementById('categoryFilter');
+    
+    loadCart();
+    setupEventListeners();
+    updateCartUI();
+    loadOrders();
+    initializeBooks();
+}
+
+// Render books to the grid
+function renderBooks(booksToRender) {
+    console.log(` renderBooks called with ${booksToRender.length} books, DOM ready: ${document.readyState}`);
+    
+    if (document.readyState !== 'complete') {
+        console.log(' DOM not ready, waiting...');
+        setTimeout(renderBooks, 100, booksToRender);
+        return;
+    }
+    
+    const productsGrid = document.getElementById('productsGrid');
+    if (!productsGrid) {
+        console.error('productsGrid element not found!');
+        return;
+    }
+    
+    productsGrid.innerHTML = '';
+    
+    if (booksToRender.length === 0) {
+        productsGrid.innerHTML = '<div class="empty-cart"><i class="fas fa-search"></i><p>No books found</p></div>';
+        console.log('No books to render');
+        return;
+    }
+    
+    booksToRender.forEach((book, index) => {
+        console.log(`Creating card for book ${index + 1}:`, book.title);
+        const bookCard = createBookCard(book);
+        productsGrid.appendChild(bookCard);
+    });
+    
+    console.log('Books rendered successfully');
+}
+
+// Format category for display
+function formatCategory(category) {
+    const categoryMap = {
+        'beast-academy': 'Beast Academy',
+        'aops-series': 'AoPS Series', 
+        'math-contest': 'Math Contest',
+        'mathstart': 'MathStart'
+    };
+    return categoryMap[category] || category;
+}
+
+// Create book card element
+function createBookCard(book) {
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    
+    // Check if book has discount or is MathStart (show in red)
+    const hasDiscount = book.original_price && book.original_price > book.price;
+    const isMathStart = book.category === 'mathstart';
+    
+    let priceDisplay;
+    if (hasDiscount) {
+        priceDisplay = `<span class="product-price-discounted">
+            <span class="original-price">$${book.original_price.toFixed(2)}</span>
+            <span class="discounted-price">$${book.price.toFixed(2)}</span>
+           </span>`;
+    } else if (isMathStart) {
+        priceDisplay = `<span class="product-price mathstart-price">$${book.price.toFixed(2)}</span>`;
+    } else {
+        priceDisplay = `<span class="product-price">$${book.price.toFixed(2)}</span>`;
+    }
+    
+    card.innerHTML = `
+        <div class="product-info">
+            <div class="product-category">${formatCategory(book.category)}</div>
+            <h3 class="product-name">${book.title}</h3>
+            <div class="product-footer">
+                ${priceDisplay}
+                <button class="add-to-cart" onclick="addToCart(${book.id})">
+                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                </button>
+            </div>
+        </div>
+    `;
+    return card;
+}
+
+// Add book to cart
+function addToCart(bookId) {
+    console.log('🛒 Adding to cart - bookId:', bookId);
+    console.log('📚 Available books:', books.map(b => ({id: b.id, title: b.title, category: b.category})));
+    
+    const book = books.find(b => b.id === bookId);
+    if (!book) {
+        console.error('❌ Book not found with ID:', bookId);
+        return;
+    }
+    
+    console.log('✅ Found book:', {id: book.id, title: book.title, category: book.category});
+    
+    // Clear any existing cart cache to ensure fresh data
+    const existingItem = cart.find(item => item.id === bookId);
+    
+    if (existingItem) {
+        existingItem.quantity++;
+        showNotification(`Added another "${book.title}" to cart`);
+    } else {
+        cart.push({
+            id: book.id,
+            title: book.title,
+            category: book.category,
+            price: book.price,
+            quantity: 1
+        });
+        showNotification(`"${book.title}" added to cart`);
+    }
+    
+    // Force cart save and UI refresh
+    saveCart();
+    updateCartUI();
+}
+
+// Remove item from cart
+function removeFromCart(bookId) {
+    cart = cart.filter(item => item.id !== bookId);
+    updateCartUI();
+}
+
+// Update item quantity
+function updateQuantity(bookId, change) {
+    const item = cart.find(item => item.id === bookId);
+    if (!item) return;
+    
+    item.quantity += change;
+    
+    if (item.quantity <= 0) {
+        removeFromCart(bookId);
+    } else {
+        updateCartUI();
+        saveCart();
+    }
+}
+
+// Update cart UI
+function updateCartUI() {
+    updateCartCount();
+    updateCartItems();
+    updateCartTotal();
+}
+
+// Update cart count
+function updateCartCount() {
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    cartCount.textContent = totalItems;
+}
+
+// Update cart items display
+function updateCartItems() {
+    if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="empty-cart">Your cart is empty</p>';
+        return;
+    }
+    
+    cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item">
+            <div class="cart-item-info">
+                <h4>${item.title}</h4>
+                <span class="cart-item-price">$${item.price.toFixed(2)}</span>
+            </div>
+            <div class="cart-item-quantity">
+                <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                <span>${item.quantity}</span>
+                <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+            </div>
+            <button class="remove-item" onclick="removeFromCart(${item.id})">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    `).join('');
+}
+
+// Update cart total
+function updateCartTotal() {
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    cartTotal.textContent = total.toFixed(2);
+}
+
+// Show notification
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        z-index: 2000;
+        animation: slideIn 0.3s ease;
+        font-weight: 600;
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Filter and sort books
+function filterAndSortBooks() {
+    let filteredBooks = [...books];
+    
+    console.log('Starting filter with books:', filteredBooks.length);
+    console.log('Global books variable:', window.books);
+    console.log('Local books variable:', books);
+    
+    // Search filter
+    const searchTerm = searchInput.value.toLowerCase();
+    if (searchTerm) {
+        filteredBooks = filteredBooks.filter(book =>
+            book.title.toLowerCase().includes(searchTerm)
+        );
+        console.log('After search filter:', filteredBooks.length);
+    }
+    
+    // Category filter
+    const selectedCategory = categoryFilter.value;
+    console.log('Selected category:', selectedCategory);
+    console.log('Available categories:', [...new Set(books.map(book => book.category))]);
+    
+    if (selectedCategory !== 'all') {
+        filteredBooks = filteredBooks.filter(book => {
+            const matches = book.category === selectedCategory;
+            console.log(`Book: ${book.title} | Category: ${book.category} | Selected: ${selectedCategory} | Match: ${matches}`);
+            return matches;
+        });
+        console.log('After category filter:', filteredBooks.length);
+    }
+    
+    console.log('Final filtered books:', filteredBooks.length);
+    renderBooks(filteredBooks);
+}
+
+// Show payment modal
+function showPaymentModal() {
+    console.log('💳 showPaymentModal called');
+    console.log('💳 Cart length in showPaymentModal:', cart.length);
+    console.log('💳 Cart contents in showPaymentModal:', cart);
+    
+    if (cart.length === 0) {
+        console.log('❌ Cart is empty in showPaymentModal, showing notification');
+        showNotification('Your cart is empty!');
+        return;
+    }
+    
+    // Redirect to Stripe Checkout instead of showing modal
+    console.log('💳 Redirecting to Stripe checkout...');
+    redirectToStripeCheckout();
+}
+
+// Direct Stripe Checkout
+async function redirectToStripeCheckout() {
+    console.log('🛒 Checkout button clicked');
+    console.log('🛒 Cart length:', cart.length);
+    console.log('🛒 Cart contents:', cart);
+    console.log('🛒 Cart from localStorage:', JSON.parse(localStorage.getItem('cart') || '[]'));
+    
+    if (cart.length === 0) {
+        console.log('❌ Cart is empty, showing notification');
+        showNotification('Your cart is empty!');
+        return;
+    }
+    
+    if (!checkoutBtn) {
+        console.error('❌ Checkout button not found!');
+        showNotification('Checkout button not available. Please refresh the page.');
+        return;
+    }
+    
+    const payBtn = checkoutBtn;
+    const originalText = payBtn.textContent;
+    
+    // Show loading state
+    payBtn.disabled = true;
+    payBtn.textContent = 'Creating payment...';
+    
+    try {
+        // Generate sequential order ID with template
+        console.log('🔢 Order ID counter before increment:', orderIdCounter);
+        const orderNumber = (orderIdCounter++).toString().padStart(4, '0');
+        const orderId = `ORD-2026ABS-${orderNumber}`;
+        
+        // Save updated counter
+        localStorage.setItem('orderIdCounter', orderIdCounter.toString());
+        console.log('🔢 Order ID counter after increment:', orderIdCounter);
+        console.log('🔢 Generated Order ID:', orderId);
+        console.log('🔢 Stored counter in localStorage:', localStorage.getItem('orderIdCounter'));
+        
+        console.log('🛒 Creating payment for order:', orderId);
+        console.log('🛒 Cart contents:', cart.map(item => ({id: item.id, title: item.title, category: item.category})));
+        console.log('Creating payment for order:', orderId);
+        
+        // Create checkout session on server
+        const itemsForStripe = cart.map(item => ({
+            price_data: {
+                currency: 'usd',
+                product_data: {
+                    name: item.title,
+                    description: item.category || 'Book',
+                    metadata: {
+                        category: item.category,
+                        book_id: item.id.toString()
+                    }
+                },
+                unit_amount: Math.round(item.price * 100)
+            },
+            quantity: item.quantity
+        }));
+        
+        console.log('📤 Items being sent to Stripe:', itemsForStripe);
+        
+        const response = await fetch('/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                orderId: orderId, 
+                items: itemsForStripe,
+                customerEmail: 'test@example.com'
+            })
+        });
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+        
+        const session = await response.json();
+        console.log('💳 Stripe session created:', session.id);
+        
+        // Store pending order info in sessionStorage
+        const pendingOrder = {
+            orderId: orderId,
+            sessionId: session.id,
+            amount: parseFloat(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)),
+            timestamp: new Date().toISOString(),
+            items: cart
+        };
+        sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
+        
+        // Redirect to Stripe
+        await stripe.redirectToCheckout({ sessionId: session.id });
+        
+    } catch (error) {
+        console.error('Payment setup error:', error);
+        console.error('Error details:', {
+            message: error.message,
+            stack: error.stack,
+            cart: cart,
+            orderId: typeof orderId !== 'undefined' ? orderId : 'undefined'
+        });
+        showNotification('Payment setup failed: ' + error.message);
+    } finally {
+        // Reset button
+        payBtn.disabled = false;
+        payBtn.textContent = originalText;
+    }
+}
+
+// Show order details for manual payment processing
+function showOrderDetailsModal(order) {
+    const modal = document.createElement('div');
+    modal.className = 'order-details-modal';
+    modal.innerHTML = `
+        <div class="order-details-content">
+            <h2>🛒 Order Summary</h2>
+            <p><strong>Order ID:</strong> ${order.id}</p>
+            <p><strong>Total:</strong> $${order.total.toFixed(2)}</p>
+            
+            <div class="order-books">
+                <h3>Books:</h3>
+                ${order.items.map(item => `
+                    <div class="order-book-item">
+                        <span>${item.title}</span>
+                        <span>${item.quantity} × $${item.price.toFixed(2)}</span>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>$${order.total.toFixed(2)}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Sales Tax (9.875% - Belmont, CA):</span>
+                    <span id="tax-amount">Calculating...</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span><strong>Total:</strong></span>
+                    <span id="total-amount">Calculating...</span>
+                </div>
+            </div>
+            
+            <div class="payment-options">
+                <h3>Payment Options:</h3>
+                <div class="pickup-info">
+                    <h4>📍 Pre-Order Information</h4>
+                    <p><strong>Location:</strong> Enriches Lab Store, Belmont, CA</p>
+                    <p><strong>Type:</strong> Pre-order - Books will be shipped to Enriches Lab</p>
+                    <p><strong>Estimated Arrival:</strong> Last week of April 2025</p>
+                    <p><strong>Notification:</strong> We'll email you when books are available for pickup</p>
+                </div>
+                <p>Total amount: <strong id="payment-total">Calculating...</strong></p>
+                <p>Click below to pay with Stripe (amount includes tax):</p>
+                <button onclick="redirectToStripePayment('${order.total.toFixed(2)}', '${order.id}')" class="btn-primary">
+                    Pay $<span id="checkout-total">Calculating...</span> with Stripe
+                </button>
+                <p style="font-size: 0.9rem; color: #6b7280; margin-top: 1rem;">
+                    Sales tax of 9.875% will be added for Belmont, CA (San Mateo County).<br>
+                    No shipping - books will be available for in-store pickup after arrival.
+                </p>
+            </div>
+            
+            <div class="modal-actions">
+                <button onclick="this.closest('.order-details-modal').remove()" class="btn-secondary">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    
+    // Calculate and display tax
+    const subtotal = order.total;
+    const taxRate = 0.09875; // 9.875% for Belmont, CA
+    const tax = Math.round(subtotal * taxRate * 100) / 100;
+    const total = subtotal + tax;
+    
+    // Update tax display
+    setTimeout(() => {
+        const taxElement = document.getElementById('tax-amount');
+        const totalElement = document.getElementById('total-amount');
+        const paymentElement = document.getElementById('payment-total');
+        const checkoutElement = document.getElementById('checkout-total');
+        
+        if (taxElement) taxElement.textContent = `$${tax.toFixed(2)}`;
+        if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
+        if (paymentElement) paymentElement.textContent = `$${total.toFixed(2)}`;
+        if (checkoutElement) checkoutElement.textContent = total.toFixed(2);
+    }, 100);
+}
+
+// Redirect to Stripe with server method
+async function redirectToStripePayment(amount, orderId) {
+    // Store order info for success page
+    sessionStorage.setItem('pendingOrder', JSON.stringify({
+        orderId: orderId,
+        amount: amount,
+        timestamp: new Date().toISOString(),
+        customerEmail: 'test@example.com' // Add your email here for testing
+    }));
+    
+    const payBtn = document.getElementById('checkoutBtn');
+    const originalText = payBtn.textContent;
+    
+    // Show loading state
+    payBtn.disabled = true;
+    payBtn.textContent = 'Creating payment...';
+    
+    try {
+        // Create checkout session on server
+        const response = await fetch('/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                orderId: orderId, 
+                items: cart,
+                customerEmail: 'test@example.com' // You can add email field
+            })
+        });
+        
+        console.log('📡 Response received:', response.status);
+        
+        const session = await response.json();
+        console.log('💳 Stripe session created:', session.id);
+        
+        // Store pending order info in sessionStorage
+        const pendingOrder = {
+            orderId: orderId,
+            sessionId: session.id,
+            amount: parseFloat(amount),
+            timestamp: new Date().toISOString(),
+            items: cart
+        };
+        sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
+        
+        console.log('💾 Pending order stored in sessionStorage:', pendingOrder);
+        
+        // Redirect to Stripe with session_id parameter
+        console.log('🔄 Redirecting to Stripe checkout...');
+        
+        // Store session info before redirect
+        sessionStorage.setItem('stripeSessionId', session.id);
+        
+        await stripe.redirectToCheckout({ sessionId: session.id });
+        
+    } catch (error) {
+        console.error('❌ Payment error:', error);
+        showNotification('Payment failed. Please try again.');
+    } finally {
+        // Restore button state
+        payBtn.disabled = false;
+        payBtn.textContent = originalText;
+    }
+}
+
+// Show order confirmation
+function showOrderConfirmation(order) {
+    const modal = document.createElement('div');
+    modal.className = 'order-confirmation-modal';
+    modal.innerHTML = `
+        <div class="order-confirmation-content">
+            <h2>🎉 Order Confirmed!</h2>
+            <p>Order ID: <strong>${order.id}</strong></p>
+            <p>Total: <strong>$${order.total.toFixed(2)}</strong></p>
+            <div class="order-books">
+                <h3>Books Ordered:</h3>
+                ${order.items.map(item => `
+                    <div class="order-book-item">
+                        <span>${item.title}</span>
+                        <span>${item.quantity} × $${item.price.toFixed(2)}</span>
+                    </div>
+                `).join('')}
+            </div>
+            <button onclick="this.closest('.order-confirmation-modal').remove()" class="close-btn">
+                Continue Shopping
+            </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+// Demo payment simulation when server isn't available
+async function simulatePaymentForDemo() {
+    // Create order for demo
+    const order = {
+        id: orderIdCounter++,
+        date: new Date().toISOString(),
+        customer: {
+            name: 'Demo Customer',
+            email: 'demo@enricheslab.com',
+            address: 'Demo Address'
+        },
+        items: cart.map(item => ({
+            id: item.id,
+            title: item.title,
+            author: item.author,
+            price: item.price,
+            quantity: item.quantity
+        })),
+        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        status: 'paid',
+        paymentToken: 'demo_payment_' + Date.now()
+    };
+    
+    // Update book stock
+    cart.forEach(cartItem => {
+        const book = books.find(b => b.id === cartItem.id);
+        if (book) {
+            book.stock -= cartItem.quantity;
+        }
+    });
+    
+    // Save order
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    localStorage.setItem('orderIdCounter', orderIdCounter.toString());
+    
+    renderBooks(books); // Refresh book display to update stock
+}
+
+// Fallback: Simulate checkout session creation (for demo without backend)
+async function createDemoCheckoutSession() {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Return mock session data
+    return {
+        id: 'cs_demo_' + Date.now(),
+        url: null // We'll handle this differently for demo
+    };
+}
+
+// Update order summary in payment modal
+function updateOrderSummary() {
+    const orderItems = document.getElementById('order-items');
+    const orderTotal = document.getElementById('order-total');
+    
+    orderItems.innerHTML = cart.map(item => `
+        <div class="order-item-summary">
+            <div>${item.title} x ${item.quantity}</div>
+            <div>$${(item.price * item.quantity).toFixed(2)}</div>
+        </div>
+    `).join('');
+    
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    orderTotal.textContent = total.toFixed(2);
+}
+
+// Process payment
+async function processPayment(e) {
+    e.preventDefault();
+    
+    if (!stripe || !cardElement) {
+        showNotification('Payment system is not available. Please try again later.');
+        return;
+    }
+    
+    const payBtn = document.getElementById('payBtn');
+    const payBtnText = document.getElementById('pay-btn-text');
+    const spinner = document.getElementById('payment-spinner');
+    
+    // Show loading state
+    payBtn.disabled = true;
+    payBtnText.textContent = 'Processing...';
+    spinner.style.display = 'block';
+    
+    const customerName = document.getElementById('customer-name').value;
+    const customerEmail = document.getElementById('customer-email').value;
+    const customerAddress = document.getElementById('customer-address').value;
+    
+    try {
+        // For demo purposes, we'll simulate payment processing
+        // In production, you would create a payment intent on your server
+        const { token, error } = await stripe.createToken(cardElement, {
+            name: customerName,
+            address_line1: customerAddress
+        });
+        
+        if (error) {
+            throw error;
+        }
+        
+        // Simulate payment confirmation
+        await simulatePayment(token.id, customerEmail, customerName, customerAddress);
+        
+    } catch (error) {
+        console.error('Payment error:', error);
+        showNotification('Payment failed: ' + error.message);
+    } finally {
+        // Reset loading state
+        payBtn.disabled = false;
+        payBtnText.textContent = 'Pay Now';
+        spinner.style.display = 'none';
+    }
+}
+
+// Simulate payment processing (replace with actual backend call)
+async function simulatePayment(token, email, name, address) {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Create order
+    const order = {
+        id: orderIdCounter++,
+        date: new Date().toISOString(),
+        customer: {
+            name: name,
+            email: email,
+            address: address
+        },
+        items: cart.map(item => ({
+            id: item.id,
+            title: item.title,
+            author: item.author,
+            price: item.price,
+            quantity: item.quantity
+        })),
+        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        status: 'paid',
+        paymentToken: token
+    };
+    
+    // Update book stock
+    cart.forEach(cartItem => {
+        const book = books.find(b => b.id === cartItem.id);
+        if (book) {
+            book.stock -= cartItem.quantity;
+        }
+    });
+    
+    // Save order
+    orders.push(order);
+    localStorage.setItem('orders', JSON.stringify(orders));
+    localStorage.setItem('orderIdCounter', orderIdCounter.toString());
+    
+    // Clear cart and close modals
+    cart = [];
+    updateCartUI();
+    paymentModal.classList.remove('active');
+    
+    showNotification(`Order #${order.id} placed successfully! Confirmation sent to ${email}`);
+    renderBooks(books); // Refresh book display to update stock
+}
+
+// Load orders from localStorage
+function loadOrders() {
+    orders = JSON.parse(localStorage.getItem('orders')) || [];
+    const storedCounter = localStorage.getItem('orderIdCounter');
+    orderIdCounter = parseInt(storedCounter) || 1;
+    console.log('📦 Loading orders - found:', orders.length, 'orders');
+    console.log('📦 Loading counter - stored:', storedCounter, 'parsed:', orderIdCounter);
+}
+
+// Reset checkout button when page regains focus (handles Stripe navigation back)
+window.addEventListener('focus', () => {
+    if (checkoutBtn && checkoutBtn.disabled && checkoutBtn.textContent === 'Creating payment...') {
+        console.log('🔄 Resetting checkout button after page focus');
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = 'Proceed to Checkout';
+    }
+});
+
+// Also reset on page visibility change
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && checkoutBtn && checkoutBtn.disabled && checkoutBtn.textContent === 'Creating payment...') {
+        console.log('🔄 Resetting checkout button after visibility change');
+        checkoutBtn.disabled = false;
+        checkoutBtn.textContent = 'Proceed to Checkout';
+    }
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    // Cart modal
+    if (cartBtn && cartModal) {
+        cartBtn.addEventListener('click', () => {
+            cartModal.classList.add('active');
+        });
+    }
+    
+    if (closeCart && cartModal) {
+        closeCart.addEventListener('click', () => {
+            cartModal.classList.remove('active');
+        });
+    }
+    
+    // Checkout button - redirects to Stripe
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', showPaymentModal);
+    }
+    
+    // Modal close on background click
+    if (cartModal) {
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.remove('active');
+            }
+        });
+    }
+    
+    // Search and filters
+    if (searchInput) {
+        searchInput.addEventListener('input', filterAndSortBooks);
+    }
+    
+    if (categoryFilter) {
+        categoryFilter.addEventListener('change', filterAndSortBooks);
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && cartModal && cartModal.classList.contains('active')) {
+            cartModal.classList.remove('active');
+        }
+    });
+}
+
+// Add CSS animations dynamically
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(20px); }
+    }
+    
+    .product-author {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stock-info {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .order-item-summary {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #f8f9fa;
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize app immediately (script is at end of body, so DOM is ready)
+init();

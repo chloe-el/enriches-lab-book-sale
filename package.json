@@ -1,0 +1,28 @@
+{
+  "name": "enriches-lab-book-sale",
+  "version": "1.0.0",
+  "description": "Enriches Lab Annual Book Sale with Stripe payment integration",
+  "main": "server-stripe.js",
+  "scripts": {
+    "start": "node server-stripe.js",
+    "dev": "nodemon server-stripe.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^4.22.1",
+    "googleapis": "^171.4.0",
+    "stripe": "^14.25.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "bookstore",
+    "stripe",
+    "payment",
+    "enriches-lab",
+    "education"
+  ],
+  "author": "Enriches Lab",
+  "license": "MIT"
+}
