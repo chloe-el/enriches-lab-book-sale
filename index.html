@@ -13,10 +13,10 @@
         <nav class="navbar">
             <div class="nav-container">
                 <div class="nav-logo">
-                    <h1>🎓 Enriches Lab Annual Book Sale</h1>
+                    <img src="Logo Small.png" alt="Enriches Lab Logo" class="logo-image">
+                    <h1>Enriches Lab Annual Book Sale</h1>
                 </div>
                 <div class="nav-menu">
-                    <input type="text" id="searchInput" class="search-bar" placeholder="Search books...">
                     <button class="cart-btn" id="cartBtn">
                         <i class="fas fa-shopping-cart"></i>
                         <span class="cart-count" id="cartCount">0</span>
@@ -26,28 +26,29 @@
         </nav>
     </header>
 
-    <main class="main-content">
-        <section class="hero">
-            <div class="hero-content">
-                <h2>Welcome to Enriches Lab Annual Book Sale</h2>
-                <p>Discover educational books that inspire lifelong learning and mathematical thinking</p>
+    <!-- Pre-Order Notice Banner -->
+    <div class="preorder-banner">
+        <div class="preorder-content">
+            <h3>📦 Pre-Order Now for Late April 2025 Delivery</h3>
+            <p>Books will be shipped to Enriches Lab store in Belmont, CA. We'll email you when they're ready for pickup.</p>
+            <div class="preorder-highlights">
+                <span><i class="fas fa-truck"></i> Ships to Enriches Lab</span>
+                <span><i class="fas fa-calendar"></i> Late April 2025</span>
+                <span><i class="fas fa-envelope"></i> Email notification</span>
             </div>
-        </section>
+        </div>
+    </div>
 
+    <main class="main-content">
         <section class="filters">
             <div class="filter-container">
+                <input type="text" id="searchInput" class="search-bar" placeholder="Search books...">
                 <select id="categoryFilter" class="filter-select">
                     <option value="all">All Categories</option>
-                    <option value="beast-academy">Beast Academy - Elementary School</option>
-                    <option value="aops-series">AoPS Series - Middle and High School</option>
-                    <option value="math-contest">Math Contest - Middle and High School</option>
-                    <option value="mathstart">MathStart - Early Discovery</option>
-                </select>
-                <select id="sortFilter" class="filter-select">
-                    <option value="default">Sort by</option>
-                    <option value="price-low">Price: Low to High</option>
-                    <option value="price-high">Price: High to Low</option>
-                    <option value="name">Name: A to Z</option>
+                    <option value="beast-academy">Beast Academy</option>
+                    <option value="aops-series">AoPS Series</option>
+                    <option value="math-contest">Math Contest</option>
+                    <option value="mathstart">MathStart</option>
                 </select>
             </div>
         </section>
@@ -69,6 +70,9 @@
             <div class="cart-footer">
                 <div class="cart-total">
                     <strong>Total: $<span id="cartTotal">0.00</span></strong>
+                </div>
+                <div class="tax-notice">
+                    <small><em>9.875% sales tax will be added at checkout</em></small>
                 </div>
                 <button class="checkout-btn" id="checkoutBtn">Proceed to Checkout</button>
             </div>

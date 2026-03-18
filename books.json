@@ -1,181 +1,208 @@
 [
     {
-        "id": 1,
-        "title": "Calculus - text & solutions",
-        "price": 59,
-        "category": "aops-series"
-    },
-    {
-        "id": 2,
-        "title": "Competition Math for Middle School",
-        "price": 29.5,
-        "category": "math-contest"
-    },
-    {
-        "id": 3,
-        "title": "Contest Prep Math - Art of Problem Solving - Volume 1",
-        "price": 47,
-        "category": "math-contest"
-    },
-    {
-        "id": 4,
-        "title": "Contest Prep Math - Art of Problem Solving - Volume 2",
-        "price": 49,
-        "category": "math-contest"
-    },
-    {
-        "id": 5,
-        "title": "Intermediate Algebra - text & solutions",
-        "price": 74,
-        "category": "aops-series"
-    },
-    {
-        "id": 6,
-        "title": "Intermediate Counting & Probability - text & solutions",
-        "price": 56,
+        "id": 13,
+        "title": "Prealgebra - text & solutions",
+        "price": 50.15,
+        "original_price": 59,
         "category": "aops-series"
     },
     {
         "id": 7,
         "title": "Introduction to Algebra - text & solutions",
-        "price": 67,
+        "price": 56.95,
+        "original_price": 67,
         "category": "aops-series"
     },
     {
         "id": 8,
         "title": "Introduction to Counting & Probability - text & solutions",
-        "price": 49,
+        "price": 41.65,
+        "original_price": 49,
         "category": "aops-series"
     },
     {
         "id": 9,
         "title": "Introduction to Geometry - text & solutions",
-        "price": 65,
+        "price": 55.25,
+        "original_price": 65,
         "category": "aops-series"
     },
     {
         "id": 10,
         "title": "Introduction to Number Theory - text & solutions",
-        "price": 55,
+        "price": 46.75,
+        "original_price": 55,
         "category": "aops-series"
     },
     {
-        "id": 11,
-        "title": "Level 1 - Guide - A-D - 4 books",
-        "price": 108,
-        "category": "beast-academy"
+        "id": 5,
+        "title": "Intermediate Algebra - text & solutions",
+        "price": 62.9,
+        "original_price": 74,
+        "category": "aops-series"
     },
     {
-        "id": 12,
-        "title": "Level 2 - Guide - A-D - 4 books",
-        "price": 64,
-        "category": "beast-academy"
-    },
-    {
-        "id": 13,
-        "title": "Level 2 - Guide A-D - 4 books",
-        "price": 64,
-        "category": "beast-academy"
-    },
-    {
-        "id": 14,
-        "title": "Level 2 - Practice - A-D - 4 books",
-        "price": 56,
-        "category": "beast-academy"
-    },
-    {
-        "id": 15,
-        "title": "Level 2 - Puzzle - 1 book",
-        "price": 10,
-        "category": "beast-academy"
-    },
-    {
-        "id": 16,
-        "title": "Level 3 - Guide A-D - 4 books",
-        "price": 64,
-        "category": "beast-academy"
-    },
-    {
-        "id": 17,
-        "title": "Level 3 - Practice - A-D - 4 books",
-        "price": 56,
-        "category": "beast-academy"
-    },
-    {
-        "id": 18,
-        "title": "Level 3 - Puzzle - 1book",
-        "price": 10,
-        "category": "beast-academy"
-    },
-    {
-        "id": 19,
-        "title": "Level 3 - Science - 3A & 3B - 2 books",
-        "price": 96,
-        "category": "beast-academy"
-    },
-    {
-        "id": 20,
-        "title": "Level 4 - Guide A-D - 4 books",
-        "price": 64,
-        "category": "beast-academy"
-    },
-    {
-        "id": 21,
-        "title": "Level 4 - Practice - A-D - 4 books",
-        "price": 56,
-        "category": "beast-academy"
-    },
-    {
-        "id": 22,
-        "title": "Level 4 - Puzzle - 1book",
-        "price": 10,
-        "category": "beast-academy"
-    },
-    {
-        "id": 23,
-        "title": "Level 4 - Science - 4A - 1 book",
-        "price": 48,
-        "category": "beast-academy"
-    },
-    {
-        "id": 24,
-        "title": "Level 5 - Guide A-D - 4 books",
-        "price": 64,
-        "category": "beast-academy"
-    },
-    {
-        "id": 25,
-        "title": "Level 5 - Practice - A-D - 4 books",
-        "price": 56,
-        "category": "beast-academy"
-    },
-    {
-        "id": 26,
-        "title": "Prealgebra - text & solutions",
-        "price": 59,
+        "id": 6,
+        "title": "Intermediate Counting & Probability - text & solutions",
+        "price": 47.6,
+        "original_price": 56,
         "category": "aops-series"
     },
     {
         "id": 27,
         "title": "Precalculus - text & solutions",
-        "price": 62,
+        "price": 52.7,
+        "original_price": 62,
         "category": "aops-series"
     },
     {
+        "id": 1,
+        "title": "Calculus - text & solutions",
+        "price": 50.15,
+        "original_price": 59,
+        "category": "aops-series"
+    },
+    {
+        "id": 2,
+        "title": "Competition Math for Middle School",
+        "price": 25.08,
+        "original_price": 29.5,
+        "category": "math-contest"
+    },
+    {
+        "id": 3,
+        "title": "Contest Prep Math - Art of Problem Solving - Volume 1",
+        "price": 39.95,
+        "original_price": 47,
+        "category": "math-contest"
+    },
+    {
+        "id": 4,
+        "title": "Contest Prep Math - Art of Problem Solving - Volume 2",
+        "price": 41.65,
+        "original_price": 49,
+        "category": "math-contest"
+    },
+    {
+        "id": 11,
+        "title": "Level 1 - Guide - A-D - 4 books",
+        "price": 91.8,
+        "original_price": 108,
+        "category": "beast-academy"
+    },
+    {
+        "id": 12,
+        "title": "Level 2 - Guide - A-D - 4 books",
+        "price": 54.4,
+        "original_price": 64,
+        "category": "beast-academy"
+    },
+    {
+        "id": 14,
+        "title": "Level 2 - Practice - A-D - 4 books",
+        "price": 47.6,
+        "original_price": 56,
+        "category": "beast-academy"
+    },
+    {
+        "id": 15,
+        "title": "Level 2 - Puzzle - 1 book",
+        "price": 8.5,
+        "original_price": 10,
+        "category": "beast-academy"
+    },
+    {
+        "id": 16,
+        "title": "Level 3 - Guide A-D - 4 books",
+        "price": 54.4,
+        "original_price": 64,
+        "category": "beast-academy"
+    },
+    {
+        "id": 17,
+        "title": "Level 3 - Practice - A-D - 4 books",
+        "price": 47.6,
+        "original_price": 56,
+        "category": "beast-academy"
+    },
+    {
+        "id": 18,
+        "title": "Level 3 - Puzzle - 1 book",
+        "price": 8.5,
+        "original_price": 10,
+        "category": "beast-academy"
+    },
+    {
+        "id": 19,
+        "title": "Level 3 - Science - 3A & 3B - 2 books",
+        "price": 81.6,
+        "original_price": 96,
+        "category": "beast-academy"
+    },
+    {
+        "id": 20,
+        "title": "Level 4 - Guide A-D - 4 books",
+        "price": 54.4,
+        "original_price": 64,
+        "category": "beast-academy"
+    },
+    {
+        "id": 21,
+        "title": "Level 4 - Practice - A-D - 4 books",
+        "price": 47.6,
+        "original_price": 56,
+        "category": "beast-academy"
+    },
+    {
+        "id": 22,
+        "title": "Level 4 - Puzzle - 1 book",
+        "price": 8.5,
+        "original_price": 10,
+        "category": "beast-academy"
+    },
+    {
+        "id": 23,
+        "title": "Level 4 - Science - 4A - 1 book",
+        "price": 40.8,
+        "original_price": 48,
+        "category": "beast-academy"
+    },
+    {
+        "id": 24,
+        "title": "Level 4 - Science - 4B - 1 book",
+        "price": 40.8,
+        "original_price": 48,
+        "category": "beast-academy"
+    },
+    {
+        "id": 25,
+        "title": "Level 5 - Guide A-D - 4 books",
+        "price": 54.4,
+        "original_price": 64,
+        "category": "beast-academy"
+    },
+    {
+        "id": 26,
+        "title": "Level 5 - Practice - A-D - 4 books",
+        "price": 47.6,
+        "original_price": 56,
+        "category": "beast-academy"
+    },
+    {
         "id": 28,
-        "title": "Level 1 - 21 books",
+        "title": "MathStart - Level 1 - 21 books",
         "price": 132.15,
         "category": "mathstart"
     },
     {
         "id": 29,
-        "title": "Level 2 - 21 books",
+        "title": "MathStart - Level 2 - 21 books",
         "price": 132.15,
         "category": "mathstart"
     },
     {
         "id": 30,
-        "title": "Level 3 - 21 books",
+        "title": "MathStart - Level 3 - 21 books",
         "price": 132.15,
         "category": "mathstart"
     }
