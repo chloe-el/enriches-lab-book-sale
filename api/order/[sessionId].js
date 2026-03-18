@@ -46,18 +46,22 @@ export default async function handler(req, res) {
     const orderId = session.metadata?.order_id || 'N/A';
     const items = session.line_items?.data || [];
     
-    // Format order data to match local server
+    // Format order data to match local server exactly
     const order = {
-      orderId: orderId,
-      created: session.created,
-      status: 'completed',
-      pickupLocation: 'Enriches Lab Store, Belmont, CA',
-      orderType: 'Pre-order',
-      estimatedArrival: 'Late April 2025',
+      sessionId: session.id,
+      orderId: session.metadata?.order_id || 'N/A',
+      customerEmail: session.customer_email,
       subtotal: parseFloat(session.metadata?.subtotal || '0'),
       tax: parseFloat(session.metadata?.tax || '0'),
       total: session.amount_total / 100,
-      books: []
+      currency: session.currency,
+      status: 'completed',
+      created: session.created,
+      books: [],
+      metadata: session.metadata,
+      pickupLocation: 'Enriches Lab Store, Belmont, CA',
+      orderType: session.metadata?.order_type || 'pre-order',
+      estimatedArrival: session.metadata?.estimated_arrival || 'Late April 2025'
     };
     
     // Process line items using local server logic

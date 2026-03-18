@@ -1,6 +1,11 @@
 // Vercel serverless function for Stripe checkout
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_51MjYP5BH1RcdRKUXMfDxSUi8nQthtIi44UBoVpgSCxzcNJLGllcDW8Dp5BFaNtkfBFOlt0zV15GYP8ja8IFF8ncw007blabqEj');
 
+// Calculate tax for order (match local server)
+function calculateTax(subtotal) {
+    return Math.round(subtotal * 0.09875 * 100) / 100; // Round to 2 decimal places
+}
+
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -16,25 +21,33 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { orderId, items, customerEmail } = req.body;
+    const { orderId, items, customerEmail, metadata = {} } = req.body;
 
+    console.log('=== CHECKOUT SESSION REQUEST ===');
+    console.log('Order ID:', orderId);
+    console.log('Items received:', JSON.stringify(items, null, 2));
+    console.log('Item details:', items.map(item => ({
+        name: item.price_data?.product_data?.name,
+        description: item.price_data?.product_data?.description,
+        category: item.price_data?.product_data?.metadata?.category
+    })));
+    console.log('=== END REQUEST ===');
+    
+    console.log('=== TAX DEBUGGING ===');
     console.log('Creating checkout session for order:', orderId);
     console.log('Received items:', JSON.stringify(items, null, 2));
 
-    // Calculate subtotal and tax
-    const TAX_RATE = 0.09875; // 9.875% for Belmont, CA
-    const subtotal = items.reduce((sum, item) => {
-      const itemAmount = (item.price_data.unit_amount * item.quantity) / 100;
-      console.log(`Item: ${item.price_data.product_data.name}, Amount: $${itemAmount.toFixed(2)}`);
-      return sum + itemAmount;
-    }, 0);
-    const tax = subtotal * TAX_RATE;
+    // Calculate subtotal and tax (match local server)
+    const subtotal = items.reduce((sum, item) => sum + (item.price_data.unit_amount * item.quantity / 100), 0);
+    const tax = calculateTax(subtotal);
+    const total = subtotal + tax;
     
     console.log(`=== TAX CALCULATION ===`);
     console.log(`Subtotal: $${subtotal.toFixed(2)}`);
-    console.log(`Tax Rate: ${TAX_RATE} (${TAX_RATE * 100}%)`);
+    console.log(`Tax Rate: 0.09875 (9.875%)`);
     console.log(`Tax: $${tax.toFixed(2)}`);
-    console.log(`Total: $${(subtotal + tax).toFixed(2)}`);
+    console.log(`Total: $${total.toFixed(2)}`);
+    console.log(`Tax calculation: ${subtotal} × 0.09875 = ${tax}`);
 
     // Create items without tax (tax will be separate line item)
     const itemsWithoutTax = items.map(item => {
@@ -97,11 +110,21 @@ export default async function handler(req, res) {
       cancel_url: `${req.headers.origin}/index.html?cancelled=true`,
       customer_email: customerEmail,
       metadata: {
-        order_id: orderId,
+        ...metadata,
         subtotal: subtotal.toFixed(2),
         tax: tax.toFixed(2),
+        total: total.toFixed(2),
+        tax_rate: '9.875%',
+        tax_location: 'Belmont, CA 94002',
+        tax_calculation: `${subtotal} × 0.09875 = ${tax}`,
+        pickup_location: 'Enriches Lab Store, Belmont, CA',
         order_type: 'pre-order',
-        estimated_arrival: 'Late April 2025'
+        estimated_arrival: 'Late April 2025',
+        shipping_method: 'In-store pickup',
+        receipt_note: 'Sales tax shown as separate line item - 9.875% CA sales tax for Belmont, CA'
+      },
+      automatic_tax: {
+        enabled: false // We're handling tax manually
       }
     });
 
