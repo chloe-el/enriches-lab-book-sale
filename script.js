@@ -377,8 +377,9 @@ function resetCheckoutButton() {
 let orders = [];
 let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
 
-// Stripe configuration - Live mode
+// Stripe configuration - Live mode (update with your actual key)
 const stripe = Stripe('pk_live_YOUR_ACTUAL_LIVE_PUBLISHABLE_KEY_HERE');
+console.log('🔑 Using Stripe live mode');
 
 // DOM elements will be initialized after DOM is ready
 let productsGrid, cartBtn, cartModal, closeCart, cartItems, cartCount, cartTotal, checkoutBtn, searchInput, categoryFilter;
