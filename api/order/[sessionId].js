@@ -67,7 +67,8 @@ export default async function handler(req, res) {
         description: item.price_data?.product_data?.description,
         metadata: item.price_data?.product_data?.metadata,
         amount: item.amount_total / 100,
-        quantity: item.quantity
+        quantity: item.quantity,
+        unit_amount: item.price_data?.unit_amount / 100
       });
       
       // Check if this is a tax line item by looking at the name/description
@@ -79,19 +80,30 @@ export default async function handler(req, res) {
         order.tax = item.amount_total / 100;
         console.log('Found tax item:', item.amount_total / 100);
       } else {
-        // This is a book item
+        // This is a book item - try multiple ways to get the title
+        let bookTitle = item.price_data?.product_data?.name;
+        if (!bookTitle || bookTitle === 'Book') {
+          bookTitle = item.price_data?.product_data?.description;
+        }
+        if (!bookTitle || bookTitle === 'Book') {
+          bookTitle = item.price_data?.product_data?.metadata?.original_title;
+        }
+        if (!bookTitle || bookTitle === 'Book') {
+          bookTitle = 'Unknown Book';
+        }
+        
         const bookPrice = item.amount_total / 100;
         const bookQuantity = item.quantity || 1;
         const bookSubtotal = bookPrice / bookQuantity;
         
         order.subtotal += bookPrice;
         order.books.push({
-          name: item.price_data?.product_data?.name || item.price_data?.product_data?.description || 'Book',
+          name: bookTitle,
           quantity: bookQuantity,
           price: bookPrice,
           subtotal: bookSubtotal
         });
-        console.log('Added book:', item.price_data?.product_data?.name);
+        console.log('Added book:', bookTitle, 'Price:', bookPrice);
       }
     });
     

@@ -37,25 +37,29 @@ export default async function handler(req, res) {
     console.log(`Total: $${(subtotal + tax).toFixed(2)}`);
 
     // Create items without tax (tax will be separate line item)
-    const itemsWithoutTax = items.map(item => ({
-        price_data: {
-            currency: 'usd',
-            product_data: {
-                name: item.price_data.product_data.name,
-                description: item.price_data.product_data.description || 'Book',
-                metadata: {
-                    book_id: item.price_data.product_data.metadata?.book_id || 'unknown',
-                    category: item.price_data.product_data.metadata?.category || 'book',
-                    order_id: orderId,
-                    tax_separate: 'true',
-                    tax_rate: '9.875%',
-                    tax_location: 'Belmont, CA 94002'
+    const itemsWithoutTax = items.map(item => {
+        console.log('Processing item:', item);
+        return {
+            price_data: {
+                currency: 'usd',
+                product_data: {
+                    name: item.price_data.product_data.name,
+                    description: item.price_data.product_data.description || 'Book',
+                    metadata: {
+                        book_id: item.price_data.product_data.metadata?.book_id || 'unknown',
+                        category: item.price_data.product_data.metadata?.category || 'book',
+                        order_id: orderId,
+                        tax_separate: 'true',
+                        tax_rate: '9.875%',
+                        tax_location: 'Belmont, CA 94002',
+                        original_title: item.price_data.product_data.name // Backup for debugging
+                    }
                 }
             },
-            unit_amount: item.price_data.unit_amount
-        },
-        quantity: item.quantity
-    }));
+            unit_amount: item.price_data.unit_amount,
+            quantity: item.quantity
+        };
+    });
 
     // Add separate tax line item for visibility
     if (tax > 0) {
