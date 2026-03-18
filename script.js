@@ -389,7 +389,7 @@ function loadOrders() {
 }
 
 function initializeApp() {
-    // Initialize DOM elements
+    // Initialize DOM elements first
     productsGrid = document.getElementById('productsGrid');
     cartBtn = document.getElementById('cartBtn');
     cartModal = document.getElementById('cartModal');
@@ -400,6 +400,18 @@ function initializeApp() {
     checkoutBtn = document.getElementById('checkoutBtn');
     searchInput = document.getElementById('searchInput');
     categoryFilter = document.getElementById('categoryFilter');
+    
+    // Check if user returned from Stripe (cancelled payment)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('cancelled') === 'true') {
+        console.log('🔄 User returned from cancelled Stripe checkout - resetting UI');
+        // Reset checkout button if it's frozen
+        if (checkoutBtn) {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = 'Proceed to Checkout';
+        }
+        showNotification('Payment was cancelled. You can try again when ready.');
+    }
     
     loadCart();
     setupEventListeners();
