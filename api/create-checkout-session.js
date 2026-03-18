@@ -119,7 +119,7 @@ export default async function handler(req, res) {
         tax_calculation: `${subtotal} × 0.09875 = ${tax}`,
         pickup_location: 'Enriches Lab Store, Belmont, CA',
         order_type: 'pre-order',
-        estimated_arrival: 'Late April 2025',
+        estimated_arrival: 'Late April 2026',
         shipping_method: 'In-store pickup',
         receipt_note: 'Sales tax shown as separate line item - 9.875% CA sales tax for Belmont, CA'
       },

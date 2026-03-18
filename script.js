@@ -821,7 +821,7 @@ function showOrderDetailsModal(order) {
                     <h4>📍 Pre-Order Information</h4>
                     <p><strong>Location:</strong> Enriches Lab Store, Belmont, CA</p>
                     <p><strong>Type:</strong> Pre-order - Books will be shipped to Enriches Lab</p>
-                    <p><strong>Estimated Arrival:</strong> Last week of April 2025</p>
+                    <p><strong>Estimated Arrival:</strong> Last week of April 2026</p>
                     <p><strong>Notification:</strong> We'll email you when books are available for pickup</p>
                 </div>
                 <p>Total amount: <strong id="payment-total">Calculating...</strong></p>
@@ -951,7 +951,7 @@ function showOrderConfirmation(order) {
             <div class="pickup-info">
                 <h4>📍 Pickup Information</h4>
                 <p><strong>Location:</strong> Enriches Lab Store, Belmont, CA</p>
-                <p><strong>Estimated Arrival:</strong> Late April 2025</p>
+                <p><strong>Estimated Arrival:</strong> Late April 2026</p>
                 <p><strong>Notification:</strong> We'll email you when books are ready for pickup</p>
                 <p><em>9.875% sales tax will be added at pickup</em></p>
             </div>

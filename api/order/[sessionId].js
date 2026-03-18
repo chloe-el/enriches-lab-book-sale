@@ -61,7 +61,7 @@ export default async function handler(req, res) {
       metadata: session.metadata,
       pickupLocation: 'Enriches Lab Store, Belmont, CA',
       orderType: session.metadata?.order_type || 'pre-order',
-      estimatedArrival: session.metadata?.estimated_arrival || 'Late April 2025'
+      estimatedArrival: session.metadata?.estimated_arrival || 'Late April 2026'
     };
     
     // Process line items using local server logic
