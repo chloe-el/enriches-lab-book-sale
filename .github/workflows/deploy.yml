@@ -1,39 +1,34 @@
 name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
       
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
+    - name: Upload to GitHub Pages
+      uses: actions/upload-pages-artifact@v3
       with:
-        node-version: '18'
-        
-    - name: Build
-      run: |
-        npm install
-        # Create dist directory
-        mkdir -p dist
-        # Copy static files
-        cp *.html dist/
-        cp -r styles dist/
-        cp -r images dist/
-        cp books.json dist/
-        cp script.js dist/
-        # Create .nojekyll file
-        touch dist/.nojekyll
+        path: './dist'
         
     - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-workflow@v3
+      id: deployment
+      uses: actions/deploy-pages@v4
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./dist
-        publish_branch: main
+        artifact-name: github-pages
+        token: ${{ secrets.GITHUB_TOKEN }}
