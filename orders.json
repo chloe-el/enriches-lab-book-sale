@@ -91,5 +91,43 @@
       }
     ],
     "completed": "2026-03-18T08:49:32.571Z"
+  },
+  {
+    "sessionId": "cs_test_b1DakDMkYGbkbx0VNO0QYRdeEcEz3sBSC9CeM9QVVKa2ZcIA4PBB163BJB",
+    "stripeSessionId": "cs_test_b1DakDMkYGbkbx0VNO0QYRdeEcEz3sBSC9CeM9QVVKa2ZcIA4PBB163BJB",
+    "orderId": "ORD-2026ABS-0034",
+    "customerEmail": "test@example.com",
+    "subtotal": 41.65,
+    "tax": 4.11,
+    "total": 45.76,
+    "currency": "usd",
+    "status": "pending",
+    "created": "2026-03-18T09:02:44.120Z",
+    "books": [
+      {
+        "name": "Introduction to Counting & Probability - text & solutions",
+        "quantity": 1,
+        "price": 41.65
+      }
+    ]
+  },
+  {
+    "sessionId": "cs_test_b1ggPkQugd59kJ56Lqww0Qc6PT7uqGcEu45Sx8CMpKSVeWzDGxJ3HzXser",
+    "stripeSessionId": "cs_test_b1ggPkQugd59kJ56Lqww0Qc6PT7uqGcEu45Sx8CMpKSVeWzDGxJ3HzXser",
+    "orderId": "ORD-2026ABS-0035",
+    "customerEmail": "test@example.com",
+    "subtotal": 41.65,
+    "tax": 4.11,
+    "total": 45.76,
+    "currency": "usd",
+    "status": "pending",
+    "created": "2026-03-18T09:02:51.748Z",
+    "books": [
+      {
+        "name": "Introduction to Counting & Probability - text & solutions",
+        "quantity": 1,
+        "price": 41.65
+      }
+    ]
   }
 ]
