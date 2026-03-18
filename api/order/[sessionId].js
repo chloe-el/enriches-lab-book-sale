@@ -16,10 +16,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Extract session ID from URL
-    const sessionId = req.query.sessionId || req.url.split('/').pop();
+    // Extract session ID from URL - handle both query param and path
+    let sessionId = req.query.sessionId;
     
+    // If not in query, try to extract from URL path
     if (!sessionId) {
+      const urlParts = req.url.split('/');
+      sessionId = urlParts[urlParts.length - 1];
+      // Remove any query string
+      sessionId = sessionId.split('?')[0];
+    }
+    
+    if (!sessionId || sessionId === 'order') {
       return res.status(400).json({ error: 'Session ID required' });
     }
     
@@ -65,7 +73,7 @@ export default async function handler(req, res) {
       }
     });
     
-    console.log('Order details retrieved:', { orderId, total: order.total });
+    console.log('Order details retrieved:', { orderId, total: order.total, booksCount: order.books.length });
     
     res.status(200).json(order);
 
