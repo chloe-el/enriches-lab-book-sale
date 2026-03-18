@@ -67,9 +67,9 @@ export default async function handler(req, res) {
                         tax_location: 'Belmont, CA 94002',
                         original_title: item.price_data.product_data.name // Backup for debugging
                     }
-                }
+                },
+                unit_amount: item.price_data.unit_amount
             },
-            unit_amount: item.price_data.unit_amount,
             quantity: item.quantity
         };
     });
