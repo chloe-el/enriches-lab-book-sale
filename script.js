@@ -379,6 +379,15 @@ function init() {
     initializeApp();
 }
 
+// Load orders from localStorage
+function loadOrders() {
+    const storedOrders = localStorage.getItem('orders');
+    if (storedOrders) {
+        orders = JSON.parse(storedOrders);
+        console.log('📋 Loaded orders:', orders.length);
+    }
+}
+
 function initializeApp() {
     // Initialize DOM elements
     productsGrid = document.getElementById('productsGrid');
@@ -685,33 +694,69 @@ async function redirectToStripeCheckout() {
         
         console.log('� Creating direct Stripe checkout for order:', orderId);
         
-        // Create checkout session directly with Stripe
-        const { error } = await stripe.redirectToCheckout({
-            lineItems: cart.map(item => ({
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: item.title,
-                        description: item.category || 'Book',
-                        metadata: {
-                            category: item.category,
-                            book_id: item.id.toString(),
-                            order_id: orderId
-                        }
+        // Create checkout session on server (restore original backend approach)
+        const response = await fetch('/create-checkout-session', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                orderId: orderId, 
+                items: cart.map(item => ({
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: item.title,
+                            description: item.category || 'Book',
+                            metadata: {
+                                category: item.category,
+                                book_id: item.id.toString(),
+                                order_id: orderId
+                            }
+                        },
+                        unit_amount: Math.round(item.price * 100)
                     },
-                    unit_amount: Math.round(item.price * 100)
-                },
-                quantity: item.quantity
-            })),
-            mode: 'payment',
-            successUrl: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
-            cancelUrl: `${window.location.origin}/index.html?cancelled=true`,
-            customerEmail: 'customer@example.com' // You can collect this from a form
+                    quantity: item.quantity
+                })),
+                customerEmail: 'customer@example.com'
+            })
         });
         
-        if (error) {
-            throw new Error(error.message);
+        if (!response.ok) {
+            const errorText = await response.text();
+            
+            // Fallback for local testing
+            if (response.status === 501) {
+                console.log('🧪 Local testing detected - showing demo order confirmation');
+                showOrderConfirmation({
+                    id: orderId,
+                    items: cart,
+                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Clear cart
+                cart = [];
+                saveCart();
+                updateCartUI();
+                
+                // Store order
+                orders.push({
+                    id: orderId,
+                    items: cart,
+                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('orders', JSON.stringify(orders));
+                
+                return;
+            }
+            
+            throw new Error(`Server error: ${response.status} - ${errorText}`);
         }
+        
+        const session = await response.json();
+        
+        // Redirect to Stripe with session ID
+        await stripe.redirectToCheckout({ sessionId: session.id });
         
     } catch (error) {
         console.error('❌ Payment setup error:', error);
@@ -878,251 +923,87 @@ function showOrderConfirmation(order) {
     modal.innerHTML = `
         <div class="order-confirmation-content">
             <h2>🎉 Order Confirmed!</h2>
-            <p>Order ID: <strong>${order.id}</strong></p>
-            <p>Total: <strong>$${order.total.toFixed(2)}</strong></p>
-            <div class="order-books">
-                <h3>Books Ordered:</h3>
+            <p><strong>Order ID:</strong> ${order.id}</p>
+            <div class="order-summary">
+                <h3>Order Details:</h3>
                 ${order.items.map(item => `
-                    <div class="order-book-item">
-                        <span>${item.title}</span>
+                    <div class="order-item">
+                        <span>${item.title} (${item.category})</span>
                         <span>${item.quantity} × $${item.price.toFixed(2)}</span>
                     </div>
                 `).join('')}
+                <div class="order-total">
+                    <strong>Total: $${order.total.toFixed(2)}</strong>
+                </div>
             </div>
-            <button onclick="this.closest('.order-confirmation-modal').remove()" class="close-btn">
-                Continue Shopping
-            </button>
+            <div class="pickup-info">
+                <h4>📍 Pickup Information</h4>
+                <p><strong>Location:</strong> Enriches Lab Store, Belmont, CA</p>
+                <p><strong>Estimated Arrival:</strong> Late April 2025</p>
+                <p><strong>Notification:</strong> We'll email you when books are ready for pickup</p>
+                <p><em>9.875% sales tax will be added at pickup</em></p>
+            </div>
+            <div class="modal-actions">
+                <button onclick="this.closest('.order-confirmation-modal').remove()" class="btn-primary">
+                    Close
+                </button>
+            </div>
         </div>
     `;
     document.body.appendChild(modal);
-}
-
-// Demo payment simulation when server isn't available
-async function simulatePaymentForDemo() {
-    // Create order for demo
-    const order = {
-        id: orderIdCounter++,
-        date: new Date().toISOString(),
-        customer: {
-            name: 'Demo Customer',
-            email: 'demo@enricheslab.com',
-            address: 'Demo Address'
-        },
-        items: cart.map(item => ({
-            id: item.id,
-            title: item.title,
-            author: item.author,
-            price: item.price,
-            quantity: item.quantity
-        })),
-        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-        status: 'paid',
-        paymentToken: 'demo_payment_' + Date.now()
-    };
     
-    // Update book stock
-    cart.forEach(cartItem => {
-        const book = books.find(b => b.id === cartItem.id);
-        if (book) {
-            book.stock -= cartItem.quantity;
+    // Close modal when clicking outside
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
         }
     });
     
-    // Save order
-    orders.push(order);
-    localStorage.setItem('orders', JSON.stringify(orders));
-    localStorage.setItem('orderIdCounter', orderIdCounter.toString());
-    
-    renderBooks(books); // Refresh book display to update stock
-}
-
-// Fallback: Simulate checkout session creation (for demo without backend)
-async function createDemoCheckoutSession() {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Return mock session data
-    return {
-        id: 'cs_demo_' + Date.now(),
-        url: null // We'll handle this differently for demo
-    };
-}
-
-// Update order summary in payment modal
-function updateOrderSummary() {
-    const orderItems = document.getElementById('order-items');
-    const orderTotal = document.getElementById('order-total');
-    
-    orderItems.innerHTML = cart.map(item => `
-        <div class="order-item-summary">
-            <div>${item.title} x ${item.quantity}</div>
-            <div>$${(item.price * item.quantity).toFixed(2)}</div>
-        </div>
-    `).join('');
-    
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    orderTotal.textContent = total.toFixed(2);
-}
-
-// Process payment
-async function processPayment(e) {
-    e.preventDefault();
-    
-    if (!stripe || !cardElement) {
-        showNotification('Payment system is not available. Please try again later.');
-        return;
-    }
-    
-    const payBtn = document.getElementById('payBtn');
-    const payBtnText = document.getElementById('pay-btn-text');
-    const spinner = document.getElementById('payment-spinner');
-    
-    // Show loading state
-    payBtn.disabled = true;
-    payBtnText.textContent = 'Processing...';
-    spinner.style.display = 'block';
-    
-    const customerName = document.getElementById('customer-name').value;
-    const customerEmail = document.getElementById('customer-email').value;
-    const customerAddress = document.getElementById('customer-address').value;
-    
-    try {
-        // For demo purposes, we'll simulate payment processing
-        // In production, you would create a payment intent on your server
-        const { token, error } = await stripe.createToken(cardElement, {
-            name: customerName,
-            address_line1: customerAddress
-        });
-        
-        if (error) {
-            throw error;
+    // Auto-close after 10 seconds
+    setTimeout(() => {
+        if (document.body.contains(modal)) {
+            modal.remove();
         }
-        
-        // Simulate payment confirmation
-        await simulatePayment(token.id, customerEmail, customerName, customerAddress);
-        
-    } catch (error) {
-        console.error('Payment error:', error);
-        showNotification('Payment failed: ' + error.message);
-    } finally {
-        // Reset loading state
-        payBtn.disabled = false;
-        payBtnText.textContent = 'Pay Now';
-        spinner.style.display = 'none';
-    }
+    }, 10000);
 }
-
-// Simulate payment processing (replace with actual backend call)
-async function simulatePayment(token, email, name, address) {
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    // Create order
-    const order = {
-        id: orderIdCounter++,
-        date: new Date().toISOString(),
-        customer: {
-            name: name,
-            email: email,
-            address: address
-        },
-        items: cart.map(item => ({
-            id: item.id,
-            title: item.title,
-            author: item.author,
-            price: item.price,
-            quantity: item.quantity
-        })),
-        total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-        status: 'paid',
-        paymentToken: token
-    };
-    
-    // Update book stock
-    cart.forEach(cartItem => {
-        const book = books.find(b => b.id === cartItem.id);
-        if (book) {
-            book.stock -= cartItem.quantity;
-        }
-    });
-    
-    // Save order
-    orders.push(order);
-    localStorage.setItem('orders', JSON.stringify(orders));
-    localStorage.setItem('orderIdCounter', orderIdCounter.toString());
-    
-    // Clear cart and close modals
-    cart = [];
-    updateCartUI();
-    paymentModal.classList.remove('active');
-    
-    showNotification(`Order #${order.id} placed successfully! Confirmation sent to ${email}`);
-    renderBooks(books); // Refresh book display to update stock
-}
-
-// Load orders from localStorage
-function loadOrders() {
-    orders = JSON.parse(localStorage.getItem('orders')) || [];
-    const storedCounter = localStorage.getItem('orderIdCounter');
-    orderIdCounter = parseInt(storedCounter) || 1;
-    console.log('📦 Loading orders - found:', orders.length, 'orders');
-    console.log('📦 Loading counter - stored:', storedCounter, 'parsed:', orderIdCounter);
-}
-
-// Reset checkout button when page regains focus (handles Stripe navigation back)
-window.addEventListener('focus', () => {
-    if (checkoutBtn && checkoutBtn.disabled && checkoutBtn.textContent === 'Creating payment...') {
-        console.log('🔄 Resetting checkout button after page focus');
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Proceed to Checkout';
-    }
-});
-
-// Also reset on page visibility change
-document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && checkoutBtn && checkoutBtn.disabled && checkoutBtn.textContent === 'Creating payment...') {
-        console.log('🔄 Resetting checkout button after visibility change');
-        checkoutBtn.disabled = false;
-        checkoutBtn.textContent = 'Proceed to Checkout';
-    }
-});
 
 // Setup event listeners
 function setupEventListeners() {
-    // Cart modal
-    if (cartBtn && cartModal) {
+    // Cart button
+    if (cartBtn) {
         cartBtn.addEventListener('click', () => {
             cartModal.classList.add('active');
         });
     }
     
-    if (closeCart && cartModal) {
+    // Close cart
+    if (closeCart) {
         closeCart.addEventListener('click', () => {
             cartModal.classList.remove('active');
         });
     }
     
-    // Checkout button - redirects to Stripe
+    // Checkout button
     if (checkoutBtn) {
         checkoutBtn.addEventListener('click', showPaymentModal);
     }
     
-    // Modal close on background click
-    if (cartModal) {
-        cartModal.addEventListener('click', (e) => {
-            if (e.target === cartModal) {
-                cartModal.classList.remove('active');
-            }
-        });
-    }
-    
-    // Search and filters
+    // Search and filter
     if (searchInput) {
         searchInput.addEventListener('input', filterAndSortBooks);
     }
     
     if (categoryFilter) {
         categoryFilter.addEventListener('change', filterAndSortBooks);
+    }
+    
+    // Close modal when clicking outside
+    if (cartModal) {
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.remove('active');
+            }
+        });
     }
     
     // Keyboard shortcuts
@@ -1141,23 +1022,69 @@ style.textContent = `
         to { opacity: 0; transform: translateX(20px); }
     }
     
-    .product-author {
-        color: #6c757d;
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
+    .order-confirmation-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
     }
     
-    .stock-info {
-        color: #6c757d;
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
+    .order-confirmation-content {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
     }
     
-    .order-item-summary {
+    .order-summary {
+        margin: 1rem 0;
+    }
+    
+    .order-item {
         display: flex;
         justify-content: space-between;
         padding: 0.5rem 0;
-        border-bottom: 1px solid #f8f9fa;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .order-total {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 2px solid #333;
+    }
+    
+    .pickup-info {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 4px;
+        margin: 1rem 0;
+    }
+    
+    .modal-actions {
+        text-align: center;
+        margin-top: 1rem;
+    }
+    
+    .btn-primary {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .btn-primary:hover {
+        background: #0056b3;
     }
 `;
 document.head.appendChild(style);
