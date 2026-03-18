@@ -56,11 +56,13 @@
     <script>
         // Get order ID from URL
         const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('orderId');
+        const orderId = urlParams.get('order_id') || urlParams.get('orderId'); // Check both formats
         
         // Load and display order details from Stripe
         async function loadOrderDetails() {
             console.log('=== SUCCESS PAGE DEBUGGING ===');
+            console.log('Full URL:', window.location.href);
+            console.log('URL params:', Object.fromEntries(urlParams.entries()));
             console.log('Looking for order ID:', orderId);
             
             const orderDetailsDiv = document.getElementById('orderDetails');
