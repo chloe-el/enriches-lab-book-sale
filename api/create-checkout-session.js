@@ -129,6 +129,43 @@ export default async function handler(req, res) {
     });
 
     console.log('Session created:', session.id);
+    
+    // Save order securely to server-side storage
+    try {
+        const orderData = {
+            sessionId: session.id,
+            stripeSessionId: session.id,
+            orderId: orderId,
+            customerEmail: customerEmail,
+            subtotal: subtotal.toFixed(2),
+            tax: tax.toFixed(2),
+            total: total.toFixed(2),
+            currency: 'usd',
+            status: 'pending',
+            created: new Date().toISOString(),
+            books: items.map(item => ({
+                name: item.price_data.product_data.name,
+                quantity: item.quantity,
+                price: (item.price_data.unit_amount * item.quantity) / 100
+            }))
+        };
+        
+        // Save to secure server storage
+        const orderResponse = await fetch(`${req.headers.origin}/api/orders`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(orderData)
+        });
+        
+        if (orderResponse.ok) {
+            console.log('Order saved securely:', orderId);
+        } else {
+            console.error('Failed to save order securely');
+        }
+    } catch (error) {
+        console.error('Error saving order:', error);
+    }
+    
     res.status(200).json({ id: session.id });
 
   } catch (error) {

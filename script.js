@@ -363,8 +363,9 @@ function loadCart() {
     console.log('🛒 Cart length after loading:', cart.length);
 }
 
-// Order management
-let orders = JSON.parse(localStorage.getItem('orders')) || [];
+// Order management - Use secure storage in production
+const secureStorage = new SecureStorage();
+let orders = [];
 let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
 
 // Stripe configuration - Replace with your actual Stripe publishable key
