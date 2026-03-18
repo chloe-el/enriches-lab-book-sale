@@ -97,7 +97,11 @@ export default async function handler(req, res) {
       cancel_url: `${req.headers.origin}/index.html?cancelled=true`,
       customer_email: customerEmail,
       metadata: {
-        order_id: orderId
+        order_id: orderId,
+        subtotal: subtotal.toFixed(2),
+        tax: tax.toFixed(2),
+        order_type: 'pre-order',
+        estimated_arrival: 'Late April 2025'
       }
     });
 

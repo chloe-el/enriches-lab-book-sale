@@ -33,8 +33,10 @@ export default async function handler(req, res) {
     
     console.log('Fetching order details for session:', sessionId);
     
-    // Retrieve the Stripe session
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    // Retrieve the Stripe session with expanded line items
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+        expand: ['line_items']
+    });
     
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
@@ -42,9 +44,9 @@ export default async function handler(req, res) {
     
     // Extract order details from session metadata and line items
     const orderId = session.metadata?.order_id || 'N/A';
-    const lineItems = await stripe.checkout.sessions.listLineItems(sessionId);
+    const items = session.line_items?.data || [];
     
-    // Format order data
+    // Format order data to match local server
     const order = {
       orderId: orderId,
       created: session.created,
@@ -52,58 +54,44 @@ export default async function handler(req, res) {
       pickupLocation: 'Enriches Lab Store, Belmont, CA',
       orderType: 'Pre-order',
       estimatedArrival: 'Late April 2025',
-      subtotal: 0,
-      tax: 0,
+      subtotal: parseFloat(session.metadata?.subtotal || '0'),
+      tax: parseFloat(session.metadata?.tax || '0'),
       total: session.amount_total / 100,
       books: []
     };
     
-    // Process line items
-    console.log('Processing line items:', lineItems.data.length);
-    
-    lineItems.data.forEach((item, index) => {
+    // Process line items using local server logic
+    items.forEach((item, index) => {
       console.log(`Item ${index}:`, {
+        description: item.description,
         name: item.price_data?.product_data?.name,
-        description: item.price_data?.product_data?.description,
         metadata: item.price_data?.product_data?.metadata,
         amount: item.amount_total / 100,
-        quantity: item.quantity,
-        unit_amount: item.price_data?.unit_amount / 100
+        quantity: item.quantity
       });
       
-      // Check if this is a tax line item by looking at the name/description
-      const isTaxItem = item.price_data?.product_data?.name?.toLowerCase().includes('tax') ||
-                        item.price_data?.product_data?.description?.toLowerCase().includes('tax') ||
+      // Check if this is a tax line item by looking at the description/name
+      const isTaxItem = item.description?.toLowerCase().includes('tax') ||
+                        item.price_data?.product_data?.name?.toLowerCase().includes('tax') ||
                         item.price_data?.product_data?.metadata?.tax_type === 'sales_tax';
       
       if (isTaxItem) {
         order.tax = item.amount_total / 100;
         console.log('Found tax item:', item.amount_total / 100);
       } else {
-        // This is a book item - try multiple ways to get the title
-        let bookTitle = item.price_data?.product_data?.name;
-        if (!bookTitle || bookTitle === 'Book') {
-          bookTitle = item.price_data?.product_data?.description;
-        }
-        if (!bookTitle || bookTitle === 'Book') {
-          bookTitle = item.price_data?.product_data?.metadata?.original_title;
-        }
-        if (!bookTitle || bookTitle === 'Book') {
-          bookTitle = 'Unknown Book';
-        }
-        
+        // Use item.description for book name (like local server)
+        const bookName = item.description || item.price_data?.product_data?.name || 'Unknown Book';
         const bookPrice = item.amount_total / 100;
         const bookQuantity = item.quantity || 1;
         const bookSubtotal = bookPrice / bookQuantity;
         
-        order.subtotal += bookPrice;
         order.books.push({
-          name: bookTitle,
+          name: bookName,
           quantity: bookQuantity,
           price: bookPrice,
           subtotal: bookSubtotal
         });
-        console.log('Added book:', bookTitle, 'Price:', bookPrice);
+        console.log('Added book:', bookName, 'Price:', bookPrice);
       }
     });
     
