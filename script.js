@@ -745,41 +745,26 @@ async function redirectToStripeCheckout() {
                 customerEmail: 'customer@example.com'
             })
         });
-        
+
         if (!response.ok) {
             const errorText = await response.text();
-            
-            // Fallback for local testing
-            if (response.status === 501) {
-                console.log('🧪 Local testing detected - showing demo order confirmation');
-                showOrderConfirmation({
-                    id: orderId,
-                    items: cart,
-                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-                    timestamp: new Date().toISOString()
-                });
-                
-                // Clear cart
-                cart = [];
-                saveCart();
-                updateCartUI();
-                
-                // Store order
-                orders.push({
-                    id: orderId,
-                    items: cart,
-                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-                    timestamp: new Date().toISOString()
-                });
-                localStorage.setItem('orders', JSON.stringify(orders));
-                
-                return;
-            }
-            
-            throw new Error(`Server error: ${response.status} - ${errorText}`);
+            console.error('❌ Server error:', response.status, errorText);
+            resetCheckoutButton();
+            showNotification('Server error: ' + errorText);
+            return;
         }
         
         const session = await response.json();
+        
+        // Validate session before redirect
+        if (!session || !session.id) {
+            console.error('❌ Invalid session response:', session);
+            resetCheckoutButton();
+            showNotification('Invalid session response');
+            return;
+        }
+        
+        console.log('✅ Session created successfully:', session.id);
         
         // Redirect to Stripe with session ID
         await stripe.redirectToCheckout({ sessionId: session.id });
