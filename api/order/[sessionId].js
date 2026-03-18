@@ -59,17 +59,39 @@ export default async function handler(req, res) {
     };
     
     // Process line items
-    lineItems.data.forEach(item => {
-      if (item.price_data?.product_data?.metadata?.tax_type === 'sales_tax') {
+    console.log('Processing line items:', lineItems.data.length);
+    
+    lineItems.data.forEach((item, index) => {
+      console.log(`Item ${index}:`, {
+        name: item.price_data?.product_data?.name,
+        description: item.price_data?.product_data?.description,
+        metadata: item.price_data?.product_data?.metadata,
+        amount: item.amount_total / 100,
+        quantity: item.quantity
+      });
+      
+      // Check if this is a tax line item by looking at the name/description
+      const isTaxItem = item.price_data?.product_data?.name?.toLowerCase().includes('tax') ||
+                        item.price_data?.product_data?.description?.toLowerCase().includes('tax') ||
+                        item.price_data?.product_data?.metadata?.tax_type === 'sales_tax';
+      
+      if (isTaxItem) {
         order.tax = item.amount_total / 100;
+        console.log('Found tax item:', item.amount_total / 100);
       } else {
-        order.subtotal += item.amount_total / 100;
+        // This is a book item
+        const bookPrice = item.amount_total / 100;
+        const bookQuantity = item.quantity || 1;
+        const bookSubtotal = bookPrice / bookQuantity;
+        
+        order.subtotal += bookPrice;
         order.books.push({
-          name: item.price_data?.product_data?.name || 'Book',
-          quantity: item.quantity,
-          price: item.amount_total / 100,
-          subtotal: (item.amount_total / 100) / item.quantity
+          name: item.price_data?.product_data?.name || item.price_data?.product_data?.description || 'Book',
+          quantity: bookQuantity,
+          price: bookPrice,
+          subtotal: bookSubtotal
         });
+        console.log('Added book:', item.price_data?.product_data?.name);
       }
     });
     
