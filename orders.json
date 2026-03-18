@@ -1,0 +1,75 @@
+[
+  {
+    "sessionId": "cs_test_b15q7u6GRFYgpU4IOGaLlbMAhxWYsGT0SNHKMvDlIBCsSNe975pgxuHvzN",
+    "stripeSessionId": "cs_test_b15q7u6GRFYgpU4IOGaLlbMAhxWYsGT0SNHKMvDlIBCsSNe975pgxuHvzN",
+    "orderId": "ORD-2026ABS-0026",
+    "customerEmail": "test@example.com",
+    "subtotal": 102.85,
+    "tax": 10.16,
+    "total": 113.00999999999999,
+    "currency": "usd",
+    "status": "paid",
+    "created": "2026-03-18T06:36:32.110Z",
+    "books": [
+      {
+        "name": "Prealgebra - text & solutions",
+        "quantity": 1,
+        "price": 50.15
+      },
+      {
+        "name": "Precalculus - text & solutions",
+        "quantity": 1,
+        "price": 52.7
+      }
+    ],
+    "completed": "2026-03-18T06:36:58.621Z"
+  },
+  {
+    "sessionId": "cs_test_b1IUS4sZbBbcY6z3AeqUBqrUvVsVYSB8paiYZwhdgQ6UoA9JD0zImU0MIi",
+    "stripeSessionId": "cs_test_b1IUS4sZbBbcY6z3AeqUBqrUvVsVYSB8paiYZwhdgQ6UoA9JD0zImU0MIi",
+    "orderId": "ORD-2026ABS-0027",
+    "customerEmail": "test@example.com",
+    "subtotal": 139.4,
+    "tax": 13.77,
+    "total": 153.17000000000002,
+    "currency": "usd",
+    "status": "pending",
+    "created": "2026-03-18T06:38:13.570Z",
+    "books": [
+      {
+        "name": "Level 1 - Guide - A-D - 4 books",
+        "quantity": 1,
+        "price": 91.8
+      },
+      {
+        "name": "Level 2 - Practice - A-D - 4 books",
+        "quantity": 1,
+        "price": 47.6
+      }
+    ]
+  },
+  {
+    "sessionId": "cs_test_b13DYb32Sb7Bxx1t4NHGXOhpVB8KHq7vME6Ojq5QJgbcsNcLquq4RcgB3V",
+    "stripeSessionId": "cs_test_b13DYb32Sb7Bxx1t4NHGXOhpVB8KHq7vME6Ojq5QJgbcsNcLquq4RcgB3V",
+    "orderId": "ORD-2026ABS-0001",
+    "customerEmail": "test@example.com",
+    "subtotal": 91.8,
+    "tax": 9.07,
+    "total": 100.87,
+    "currency": "usd",
+    "status": "pending",
+    "created": "2026-03-18T06:39:21.655Z",
+    "books": [
+      {
+        "name": "Prealgebra - text & solutions",
+        "quantity": 1,
+        "price": 50.15
+      },
+      {
+        "name": "Introduction to Counting & Probability - text & solutions",
+        "quantity": 1,
+        "price": 41.65
+      }
+    ]
+  }
+]

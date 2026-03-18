@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Successful - Enriches Lab Book Sale</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <img src="Logo Small.png" alt="Enriches Lab Logo" class="logo-image">
+                    <h1>Enriches Lab Annual Book Sale</h1>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <section class="success-section">
+            <div class="success-content">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h1>Payment Successful!</h1>
+                <p>Thank you for your order! Your payment has been processed successfully.</p>
+                
+                <div id="orderDetails" class="order-details">
+                    <div class="loading">Loading order details...</div>
+                </div>
+                
+                <div class="next-steps">
+                    <h3>What's Next?</h3>
+                    <ul>
+                        <li>You'll receive a confirmation email with your receipt</li>
+                        <li>You will receive an email for pickup instruction when books arrive</li>
+                        <li>Email contact@enricheslab.com for any questions</li>
+                    </ul>
+                </div>
+                
+                <div class="action-buttons">
+                    <button onclick="window.location.href='index.html'" class="btn-primary">
+                        <i class="fas fa-book"></i> Continue Shopping
+                    </button>
+                    <button onclick="window.print()" class="btn-secondary">
+                        <i class="fas fa-print"></i> Print Receipt
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Get order ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        
+        // Load and display order details from Stripe
+        async function loadOrderDetails() {
+            console.log('=== SUCCESS PAGE DEBUGGING ===');
+            console.log('Looking for order ID:', orderId);
+            
+            const orderDetailsDiv = document.getElementById('orderDetails');
+            
+            if (!orderId) {
+                orderDetailsDiv.innerHTML = `
+                    <div class="error-message">
+                        <p>No order ID found. Please check your confirmation email.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            try {
+                // Try to get session ID from URL or sessionStorage
+                let sessionId = urlParams.get('session_id');
+                
+                if (!sessionId) {
+                    // Try to get from sessionStorage
+                    const pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder')) || {};
+                    sessionId = pendingOrder.sessionId;
+                }
+                
+                if (sessionId) {
+                    // Mark order as completed in local storage
+                    try {
+                        await fetch('/complete-order', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ sessionId: sessionId })
+                        });
+                        console.log('✅ Order marked as completed in local storage');
+                    } catch (error) {
+                        console.log('⚠️ Could not mark order as completed:', error.message);
+                    }
+                    
+                    // Fetch order details from Stripe
+                    const response = await fetch(`/order/${sessionId}`);
+                    
+                    if (response.ok) {
+                        const order = await response.json();
+                        displayOrderDetails(order);
+                        return;
+                    }
+                }
+                
+                // Fallback to sessionStorage if Stripe fetch fails
+                const pendingOrder = JSON.parse(sessionStorage.getItem('pendingOrder')) || {};
+                if (pendingOrder.orderId === orderId) {
+                    displayFallbackOrderDetails(pendingOrder);
+                    return;
+                }
+                
+                // No order found
+                orderDetailsDiv.innerHTML = `
+                    <div class="error-message">
+                        <p>Order details not found. Order ID: ${orderId}</p>
+                        <p>This might be because:</p>
+                        <ul>
+                            <li>The order was just completed and is being processed</li>
+                            <li>Browser storage was cleared</li>
+                            <li>You're using a different browser or device</li>
+                        </ul>
+                        <p><strong>Order Information:</strong></p>
+                        <ul>
+                            <li>Order ID: ${orderId}</li>
+                            <li>Pickup: Enriches Lab Store, Belmont, CA</li>
+                        </ul>
+                        <p><strong>Next Steps:</strong></p>
+                        <ul>
+                            <li><strong>Email:</strong> You'll receive a confirmation email with your receipt</li>
+                            <li><strong>Pre-order:</strong> Books will be shipped to Enriches Lab in late April 2025</li>
+                            <li><strong>Pickup:</strong> We'll email you when books are available for pickup at Enriches Lab, Belmont, CA</li>
+                            <li><strong>Order ID:</strong> Bring ${orderId} for pickup when books arrive</li>
+                        </ul>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading order details:', error);
+                orderDetailsDiv.innerHTML = `
+                    <div class="error-message">
+                        <p>Error loading order details. Please try again later.</p>
+                        <p>Order ID: ${orderId}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function displayOrderDetails(order) {
+            const orderDetailsDiv = document.getElementById('orderDetails');
+            
+            // Use orderId from URL as fallback if not in order object
+            const displayOrderId = order.orderId && order.orderId !== 'N/A' ? order.orderId : orderId;
+            
+            let orderContent = `
+                <div class="order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="order-info">
+                        <p><strong>Order ID:</strong> ${displayOrderId}</p>
+                        <p><strong>Date:</strong> ${new Date(order.created).toLocaleString()}</p>
+                        <p><strong>Status:</strong> <span class="status-completed">Payment Completed</span></p>
+                        <p><strong>Pickup Location:</strong> ${order.pickupLocation}</p>
+                        <p><strong>Order Type:</strong> ${order.orderType}</p>
+                        <p><strong>Estimated Arrival:</strong> ${order.estimatedArrival}</p>
+                    </div>`;
+            
+            // Show items if available
+            if (order.books && order.books.length > 0) {
+                orderContent += `
+                    <div class="order-books">
+                        <h3>Books Ordered:</h3>
+                        ${order.books.map(book => `
+                            <div class="order-book-item">
+                                <div class="book-info">
+                                    <div class="book-title">${book.name}</div>
+                                </div>
+                                <div class="book-price">
+                                    ${book.quantity} × $${book.subtotal.toFixed(2)} = $${book.price.toFixed(2)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="order-summary-details">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span>$${order.subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row tax-row">
+                            <span><strong>Sales Tax (9.875% - Belmont, CA):</strong></span>
+                            <span><strong>$${order.tax.toFixed(2)}</strong></span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span><strong>Total Paid:</strong></span>
+                            <span><strong>$${order.total.toFixed(2)}</strong></span>
+                        </div>
+                    </div>`;
+            } else {
+                orderContent += `
+                    <div class="order-summary-details">
+                        <div class="summary-row">
+                            <span><strong>Total Paid:</strong></span>
+                            <span><strong>$${order.total.toFixed(2)}</strong></span>
+                        </div>
+                        <div class="summary-row">
+                            <span><strong>Includes 9.875% sales tax</strong></span>
+                        </div>
+                    </div>`;
+            }
+            
+            orderContent += `</div>`;
+            orderDetailsDiv.innerHTML = orderContent;
+        }
+        
+        function displayFallbackOrderDetails(pendingOrder) {
+            const orderDetailsDiv = document.getElementById('orderDetails');
+            
+            // Use orderId from URL as fallback
+            const displayOrderId = pendingOrder.orderId || orderId;
+            
+            let orderContent = `
+                <div class="order-summary">
+                    <h2>Order Summary</h2>
+                    <div class="order-info">
+                        <p><strong>Order ID:</strong> ${displayOrderId}</p>
+                        <p><strong>Date:</strong> ${new Date(pendingOrder.timestamp).toLocaleString()}</p>
+                        <p><strong>Status:</strong> <span class="status-completed">Payment Completed</span></p>
+                        <p><strong>Pickup Location:</strong> Enriches Lab Store, Belmont, CA</p>
+                    </div>`;
+            
+            // Show items if available
+            if (pendingOrder.items && pendingOrder.items.length > 0) {
+                const subtotal = pendingOrder.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+                const taxRate = 0.09875;
+                const tax = Math.round(subtotal * taxRate * 100) / 100;
+                const total = subtotal + tax;
+                
+                orderContent += `
+                    <div class="order-books">
+                        <h3>Books Ordered:</h3>
+                        ${pendingOrder.items.map(item => `
+                            <div class="order-book-item">
+                                <div class="book-info">
+                                    <div class="book-title">${item.title}</div>
+                                    <div class="book-category">${item.category}</div>
+                                    ${item.original_price ? `<div class="book-discount">Originally $${item.original_price.toFixed(2)}</div>` : ''}
+                                </div>
+                                <div class="book-price">
+                                    ${item.quantity} × $${item.price.toFixed(2)} = $${(item.price * item.quantity).toFixed(2)}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="order-summary-details">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span>$${subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="summary-row tax-row">
+                            <span><strong>Sales Tax (9.875% - Belmont, CA):</strong></span>
+                            <span><strong>$${tax.toFixed(2)}</strong></span>
+                        </div>
+                        <div class="summary-row total-row">
+                            <span><strong>Total Paid:</strong></span>
+                            <span><strong>$${total.toFixed(2)}</strong></span>
+                        </div>
+                    </div>`;
+            } else {
+                orderContent += `
+                    <div class="order-summary-details">
+                        <div class="summary-row">
+                            <span><strong>Total Paid:</strong></span>
+                            <span><strong>$${pendingOrder.amount || '0.00'}</strong></span>
+                        </div>
+                        <div class="summary-row">
+                            <span><strong>Includes 9.875% sales tax</strong></span>
+                        </div>
+                    </div>`;
+            }
+            
+            orderContent += `</div>`;
+            orderDetailsDiv.innerHTML = orderContent;
+        }
+        
+        // Load order details when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Clear cart as backup measure
+            console.log('🧹 Clearing cart on success page load');
+            localStorage.setItem('cart', JSON.stringify([]));
+            
+            // Load order details
+            loadOrderDetails();
+        });
+    </script>
+
+    <style>
+        .success-section {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .success-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 4rem;
+            color: #059669;
+            margin-bottom: 1rem;
+        }
+        
+        .success-content h1 {
+            color: #059669;
+            margin-bottom: 1rem;
+        }
+        
+        .order-details {
+            margin: 2rem 0;
+            text-align: left;
+        }
+        
+        .order-summary {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        
+        .order-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-completed {
+            color: #059669;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            color: #f59e0b; /* Orange for pending */
+            font-weight: bold;
+        }
+        
+        .order-books {
+            margin: 1.5rem 0;
+        }
+        
+        .order-book-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .book-title {
+            font-weight: bold;
+            margin-bottom: 0.25rem;
+        }
+        
+        .book-category {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .book-discount {
+            color: #dc2626;
+            font-size: 0.8rem;
+            text-decoration: line-through;
+        }
+        
+        .book-price {
+            font-weight: bold;
+            color: #2563eb;
+            white-space: nowrap;
+        }
+        
+        .order-summary-details {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.total-row {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #2563eb;
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+    border-top: 2px solid #e5e7eb;
+}
+
+.tax-row {
+    font-weight: 600;
+}
+
+.error-message {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 1.5rem;
+    color: #dc2626;
+}
+
+.error-message ul {
+    text-align: left;
+    margin: 1rem 0;
+}
+
+.error-message li {
+    margin: 0.5rem 0;
+}
+
+.test-mode-notice {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    color: #856404;
+}
+
+.test-mode-notice p {
+    margin: 0 0 0.5rem 0;
+    font-weight: bold;
+}
+
+.test-mode-notice ul {
+    margin: 0.5rem 0;
+}
+
+.test-mode-notice li {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.pre-order-notice {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: #e8f5e8;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    color: #2e7d32;
+}
+
+.pre-order-notice p {
+    margin: 0 0 0.5rem 0;
+    font-weight: bold;
+}
+
+.pre-order-notice ul {
+    margin: 0.5rem 0;
+}
+
+.pre-order-notice li {
+    margin: 0.25rem 0;
+    font-size: 0.9rem;
+}
+
+.order-total {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 2px solid #e5e7eb;
+    font-size: 1.25rem;
+    text-align: right;
+}
+
+.next-steps {
+    margin: 2rem 0;
+    text-align: left;
+}
+
+.next-steps h3 {
+    margin-bottom: 1rem;
+}
+
+.next-steps ul {
+    list-style: none;
+    padding: 0;
+}
+
+.next-steps li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.next-steps li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #059669;
+    font-weight: bold;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.btn-primary, .btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: #2563eb;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-secondary {
+    background: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #4b5563;
+}
+
+@media (max-width: 768px) {
+    .success-content {
+        padding: 2rem 1rem;
+    }
+    
+    .order-book-item {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .book-price {
+        text-align: left;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
+@media print {
+    .action-buttons, .next-steps {
+        display: none;
+    }
+    
+    .success-content {
+        box-shadow: none;
+        border: 1px solid #e5e7eb;
+    }
+}
+    </style>
+</body>
+</html>
