@@ -368,7 +368,7 @@ let orders = JSON.parse(localStorage.getItem('orders')) || [];
 let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
 
 // Stripe configuration - Replace with your actual Stripe publishable key
-const stripe = Stripe(process.env.STRIPE_PUBLISHABLE_KEY || 'pk_live_YOUR_LIVE_PUBLISHABLE_KEY');
+const stripe = Stripe('pk_test_51MjYP5BH1RcdRKUX3FNL1PlOre8TEsF5xLTW6Efyy5btRq32oWQwLCLgBwqnvsjPz9Z4oT3nXuFgxgF8DTyTZsQ200BkAvwexc');
 
 // DOM elements will be initialized after DOM is ready
 let productsGrid, cartBtn, cartModal, closeCart, cartItems, cartCount, cartTotal, checkoutBtn, searchInput, categoryFilter;
@@ -754,7 +754,7 @@ async function redirectToStripeCheckout() {
             message: error.message,
             stack: error.stack,
             cart: cart,
-            orderId: orderId || 'undefined'
+            orderId: typeof orderId !== 'undefined' ? orderId : 'undefined'
         });
         showNotification('Payment setup failed: ' + error.message);
     } finally {

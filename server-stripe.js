@@ -1,6 +1,6 @@
 // Stripe server with Stripe as source of truth for orders
 const express = require('express');
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_live_YOUR_LIVE_SECRET_KEY');
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY || 'sk_test_51MjYP5BH1RcdRKUXMfDxSUi8nQthtIi44UBoVpgSCxzcNJLGllcDW8Dp5BFaNtkfBFOlt0zV15GYP8ja8IFF8ncw007blabqEj');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
