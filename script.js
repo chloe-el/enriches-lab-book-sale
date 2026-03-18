@@ -656,22 +656,15 @@ function showPaymentModal() {
     redirectToStripeCheckout();
 }
 
-// Direct Stripe Checkout
+// Direct Stripe Checkout (no backend required)
 async function redirectToStripeCheckout() {
     console.log('🛒 Checkout button clicked');
     console.log('🛒 Cart length:', cart.length);
     console.log('🛒 Cart contents:', cart);
-    console.log('🛒 Cart from localStorage:', JSON.parse(localStorage.getItem('cart') || '[]'));
     
     if (cart.length === 0) {
         console.log('❌ Cart is empty, showing notification');
         showNotification('Your cart is empty!');
-        return;
-    }
-    
-    if (!checkoutBtn) {
-        console.error('❌ Checkout button not found!');
-        showNotification('Checkout button not available. Please refresh the page.');
         return;
     }
     
@@ -683,79 +676,45 @@ async function redirectToStripeCheckout() {
     payBtn.textContent = 'Creating payment...';
     
     try {
-        // Generate sequential order ID with template
-        console.log('🔢 Order ID counter before increment:', orderIdCounter);
+        // Generate sequential order ID
         const orderNumber = (orderIdCounter++).toString().padStart(4, '0');
         const orderId = `ORD-2026ABS-${orderNumber}`;
         
         // Save updated counter
         localStorage.setItem('orderIdCounter', orderIdCounter.toString());
-        console.log('🔢 Order ID counter after increment:', orderIdCounter);
-        console.log('🔢 Generated Order ID:', orderId);
-        console.log('🔢 Stored counter in localStorage:', localStorage.getItem('orderIdCounter'));
         
-        console.log('🛒 Creating payment for order:', orderId);
-        console.log('🛒 Cart contents:', cart.map(item => ({id: item.id, title: item.title, category: item.category})));
-        console.log('Creating payment for order:', orderId);
+        console.log('� Creating direct Stripe checkout for order:', orderId);
         
-        // Create checkout session on server
-        const itemsForStripe = cart.map(item => ({
-            price_data: {
-                currency: 'usd',
-                product_data: {
-                    name: item.title,
-                    description: item.category || 'Book',
-                    metadata: {
-                        category: item.category,
-                        book_id: item.id.toString()
-                    }
+        // Create checkout session directly with Stripe
+        const { error } = await stripe.redirectToCheckout({
+            lineItems: cart.map(item => ({
+                price_data: {
+                    currency: 'usd',
+                    product_data: {
+                        name: item.title,
+                        description: item.category || 'Book',
+                        metadata: {
+                            category: item.category,
+                            book_id: item.id.toString(),
+                            order_id: orderId
+                        }
+                    },
+                    unit_amount: Math.round(item.price * 100)
                 },
-                unit_amount: Math.round(item.price * 100)
-            },
-            quantity: item.quantity
-        }));
-        
-        console.log('📤 Items being sent to Stripe:', itemsForStripe);
-        
-        const response = await fetch('/create-checkout-session', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                orderId: orderId, 
-                items: itemsForStripe,
-                customerEmail: 'test@example.com'
-            })
+                quantity: item.quantity
+            })),
+            mode: 'payment',
+            successUrl: `${window.location.origin}/success.html?session_id={CHECKOUT_SESSION_ID}&order_id=${orderId}`,
+            cancelUrl: `${window.location.origin}/index.html?cancelled=true`,
+            customerEmail: 'customer@example.com' // You can collect this from a form
         });
         
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Server error: ${response.status} - ${errorText}`);
+        if (error) {
+            throw new Error(error.message);
         }
         
-        const session = await response.json();
-        console.log('💳 Stripe session created:', session.id);
-        
-        // Store pending order info in sessionStorage
-        const pendingOrder = {
-            orderId: orderId,
-            sessionId: session.id,
-            amount: parseFloat(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)),
-            timestamp: new Date().toISOString(),
-            items: cart
-        };
-        sessionStorage.setItem('pendingOrder', JSON.stringify(pendingOrder));
-        
-        // Redirect to Stripe
-        await stripe.redirectToCheckout({ sessionId: session.id });
-        
     } catch (error) {
-        console.error('Payment setup error:', error);
-        console.error('Error details:', {
-            message: error.message,
-            stack: error.stack,
-            cart: cart,
-            orderId: typeof orderId !== 'undefined' ? orderId : 'undefined'
-        });
+        console.error('❌ Payment setup error:', error);
         showNotification('Payment setup failed: ' + error.message);
     } finally {
         // Reset button

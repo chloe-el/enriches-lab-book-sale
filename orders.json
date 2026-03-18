@@ -129,5 +129,24 @@
         "price": 41.65
       }
     ]
+  },
+  {
+    "sessionId": "cs_test_b1gehiG5SNbagVulR8nsicigHXgGiuljZrPmk1gJ2BGmRXz5OyhqSYZE2w",
+    "stripeSessionId": "cs_test_b1gehiG5SNbagVulR8nsicigHXgGiuljZrPmk1gJ2BGmRXz5OyhqSYZE2w",
+    "orderId": "ORD-2026ABS-0041",
+    "customerEmail": "test@example.com",
+    "subtotal": 50.15,
+    "tax": 4.95,
+    "total": 55.1,
+    "currency": "usd",
+    "status": "pending",
+    "created": "2026-03-18T10:04:40.045Z",
+    "books": [
+      {
+        "name": "Prealgebra - text & solutions",
+        "quantity": 1,
+        "price": 50.15
+      }
+    ]
   }
 ]
