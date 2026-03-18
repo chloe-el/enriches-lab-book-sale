@@ -695,7 +695,7 @@ async function redirectToStripeCheckout() {
         console.log('� Creating direct Stripe checkout for order:', orderId);
         
         // Create checkout session on server (restore original backend approach)
-        const response = await fetch('/create-checkout-session', {
+        const response = await fetch('/api/create-checkout-session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
