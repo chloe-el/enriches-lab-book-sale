@@ -378,7 +378,7 @@ let orders = [];
 let orderIdCounter = parseInt(localStorage.getItem('orderIdCounter')) || 1;
 
 // Stripe configuration - Live mode (update with your actual key)
-const stripe = Stripe('pk_live_YOUR_ACTUAL_LIVE_PUBLISHABLE_KEY_HERE');
+const stripe = Stripe('pk_live_51MjYP5BH1RcdRKUXkqJRnllhzacRrCbARjmdOrtDFTlTy3a7a1hSufIeSMPhytSJqyd2n8Dv5TFNg3isvdqMf3Tl005ayfHq1Z');
 console.log('🔑 Using Stripe live mode');
 
 // DOM elements will be initialized after DOM is ready
